@@ -1,0 +1,1 @@
+Hermes, execute safely inside /home/klsx/NeuroPromptSemanticCompiler. Build a semantic prompt compiler with clear phases, no destructive commands, no sudo, no external API calls, and produce markdown reports plus verification artifacts.

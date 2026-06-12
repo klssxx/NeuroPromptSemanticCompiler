@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">NeuroPrompt Semantic Compiler</title>
+  <desc id="desc">High-contrast launcher icon: a clean prompt sheet with an N-shaped neural compiler mark and code brackets.</desc>
+  <defs>
+    <linearGradient id="bg" x1="64" y1="32" x2="448" y2="480" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#182231"/>
+      <stop offset="0.55" stop-color="#111822"/>
+      <stop offset="1" stop-color="#080B10"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="128" y1="120" x2="378" y2="392" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#75DCFF"/>
+      <stop offset="0.5" stop-color="#2F9DEB"/>
+      <stop offset="1" stop-color="#176AB4"/>
+    </linearGradient>
+    <linearGradient id="green" x1="126" y1="128" x2="386" y2="392" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5CEAA5"/>
+      <stop offset="1" stop-color="#22A86B"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="142" y1="110" x2="370" y2="414" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F4F9FD"/>
+      <stop offset="1" stop-color="#C9D7E3"/>
+    </linearGradient>
+    <filter id="shadow" x="-16%" y="-16%" width="132%" height="132%">
+      <feDropShadow dx="0" dy="9" stdDeviation="10" flood-color="#000000" flood-opacity="0.43"/>
+    </filter>
+  </defs>
+
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="url(#bg)"/>
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="none" stroke="#263445" stroke-width="6"/>
+
+  <!-- Clean prompt sheet -->
+  <path d="M154 106h152l62 62v228c0 18-15 33-33 33H154c-18 0-33-15-33-33V139c0-18 15-33 33-33Z" fill="url(#paper)" filter="url(#shadow)"/>
+  <path d="M306 106v48c0 10 8 18 18 18h44" fill="#AFC4D4" opacity="0.88"/>
+
+  <!-- Code brackets, deliberately thick for 16/32 px readability -->
+  <g fill="none" stroke="url(#green)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M90 211l-38 45 38 45"/>
+    <path d="M422 211l38 45-38 45"/>
+  </g>
+
+  <!-- N-shaped semantic compiler mark -->
+  <path d="M166 358V166c0-12 10-22 22-22h9c9 0 17 5 21 12l104 171V166c0-12 10-22 22-22h10c12 0 22 10 22 22v192c0 12-10 22-22 22h-12c-8 0-16-5-20-12L218 198v160c0 12-10 22-22 22h-8c-12 0-22-10-22-22Z" fill="url(#blue)"/>
+  <path d="M215 160l106 174" fill="none" stroke="#EAFBFF" stroke-width="9" stroke-linecap="round" opacity="0.74"/>
+
+  <!-- Large graph nodes, readable at launcher sizes -->
+  <g stroke="#0B1118" stroke-width="8">
+    <circle cx="194" cy="168" r="24" fill="url(#green)"/>
+    <circle cx="321" cy="334" r="24" fill="url(#green)"/>
+    <circle cx="350" cy="168" r="21" fill="#75DCFF"/>
+    <circle cx="194" cy="356" r="21" fill="#75DCFF"/>
+  </g>
+</svg>

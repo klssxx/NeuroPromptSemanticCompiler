@@ -1,0 +1,36 @@
+{
+  "version": "0.1",
+  "default_level": "balanced",
+  "supported_levels": [
+    "safe",
+    "balanced",
+    "aggressive",
+    "all"
+  ],
+  "supported_targets": [
+    "gpt",
+    "codex",
+    "hermes",
+    "claude",
+    "gemini",
+    "qwen",
+    "deepseek",
+    "llama",
+    "mistral",
+    "generic"
+  ],
+  "critical_constraints": [
+    "no_sudo",
+    "no_external_api",
+    "no_destructive_actions",
+    "stay_inside_project_root"
+  ],
+  "strict_policy": {
+    "min_score": 80,
+    "max_critical_losses": 0,
+    "fail_on_missing_safety": true,
+    "fail_on_missing_goal": true
+  },
+  "aggressive_warning": "Aggressive compression may lose nuance; review context_loss_report.md",
+  "nsl_header": "NSL/0.1"
+}
