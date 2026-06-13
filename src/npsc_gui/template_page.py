@@ -117,13 +117,21 @@ def build_template_page(parent: "MainWindow") -> QWidget:
     header.addWidget(new_btn)
     layout.addLayout(header)
 
-    # Category filter
+    # Category filter and search
     filter_row = QHBoxLayout()
     filter_row.addWidget(QLabel(tr("tpl.filter.category")))
     category_combo = QComboBox()
     category_combo.addItem(tr("tpl.filter.all"))
-    category_combo.setMinimumWidth(180)
+    category_combo.setMinimumWidth(120)
     filter_row.addWidget(category_combo)
+
+    # Text search
+    filter_row.addWidget(QLabel("Buscar:"))
+    search_edit = QLineEdit()
+    search_edit.setPlaceholderText("Filtrar por nombre o etiqueta...")
+    search_edit.setMinimumWidth(180)
+    filter_row.addWidget(search_edit, 1)
+
     filter_row.addStretch(1)
 
     import_btn = QPushButton(tr("tpl.action.import"))
@@ -172,6 +180,7 @@ def build_template_page(parent: "MainWindow") -> QWidget:
     # Store references on the page widget for later access
     page._template_list = template_list
     page._category_combo = category_combo
+    page._search_edit = search_edit
     page._content_preview = content_preview
     page._meta_label = meta_label
 
@@ -180,7 +189,10 @@ def build_template_page(parent: "MainWindow") -> QWidget:
         lambda item, _prev: _show_template_detail(parent, item, content_preview, meta_label)
     )
     category_combo.currentTextChanged.connect(
-        lambda _txt: _refresh_template_list(parent, template_list, category_combo)
+        lambda _txt: _refresh_template_list(parent, template_list, category_combo, search_edit)
+    )
+    search_edit.textChanged.connect(
+        lambda _txt: _refresh_template_list(parent, template_list, category_combo, search_edit)
     )
     use_btn.clicked.connect(lambda: _use_template(parent, template_list))
     edit_btn.clicked.connect(lambda: _edit_template(parent, template_list))
@@ -188,7 +200,7 @@ def build_template_page(parent: "MainWindow") -> QWidget:
     del_btn.clicked.connect(lambda: _delete_template(parent, template_list))
 
     # Initial load
-    _refresh_template_list(parent, template_list, category_combo)
+    _refresh_template_list(parent, template_list, category_combo, search_edit)
 
     return page
 
@@ -199,17 +211,30 @@ def _get_manager(parent) -> TemplateManager:
     return parent._template_manager
 
 
-def _refresh_template_list(parent, list_widget: QListWidget, category_combo: QComboBox) -> None:
+def _refresh_template_list(parent, list_widget: QListWidget, category_combo: QComboBox,
+                          search_edit: QLineEdit | None = None) -> None:
     mgr = _get_manager(parent)
     list_widget.clear()
     category = category_combo.currentText()
     tr_all = tr("tpl.filter.all")
+    search_text = search_edit.text().strip().lower() if search_edit else ""
 
     templates = mgr.list_all()
     for tpl in templates:
         if category != tr_all and tpl.category != category:
             continue
-        item = QListWidgetItem(f"{tpl.name}  [{tpl.category}]")
+        # Text search filter (name or tags)
+        if search_text:
+            name_match = search_text in tpl.name.lower()
+            tag_match = any(search_text in tag.lower() for tag in tpl.tags)
+            desc_match = search_text in tpl.description.lower()
+            if not (name_match or tag_match or desc_match):
+                continue
+        tags_str = ", ".join(tpl.tags) if tpl.tags else ""
+        display = f"{tpl.name}  [{tpl.category}]"
+        if tags_str:
+            display += f"  ({tags_str})"
+        item = QListWidgetItem(display)
         item.setData(Qt.UserRole, tpl.id)
         list_widget.addItem(item)
 

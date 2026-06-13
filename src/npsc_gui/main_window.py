@@ -53,6 +53,9 @@ from npsc_gui.components.tool_card import ToolCard
 from npsc_gui.components.nav_group import NavGroup, NavItem
 from npsc_gui.template_page import build_template_page
 from npsc_gui.history_page import build_history_page
+from npsc_gui.advanced_mode_page import AdvancedModePage
+from npsc_gui.about_dialog import AboutDialog
+from npsc_gui.export_preview import ExportPreviewDialog
 from token_estimator import estimate_counters
 from variables import detect_variables, fill_variables
 from field_validator import validate_compile_form
@@ -141,6 +144,7 @@ class MainWindow(QMainWindow):
 
         # Mode state — default to simple
         self._current_mode: str = MODE_SIMPLE
+        self._advanced_sections_dirty = False
 
         # Debounce timer for counter updates (avoid estimate_text on every keystroke)
         self._counters_debounce_timer = QTimer(self)
@@ -215,6 +219,12 @@ class MainWindow(QMainWindow):
         layout.addWidget(title)
         layout.addWidget(sep)
         layout.addWidget(sub)
+
+        # Version label
+        self._header_version = QLabel("v1.0.0")
+        self._header_version.setObjectName("Muted")
+        layout.addWidget(self._header_version)
+
         layout.addStretch(1)
 
         self.header_chip = StatusChip(tr("status.ready"), "ok")
@@ -226,6 +236,14 @@ class MainWindow(QMainWindow):
         self.mode_toggle_btn.clicked.connect(self._toggle_mode)
         apply_tooltip(self.mode_toggle_btn, "advanced_mode")
         layout.addWidget(self.mode_toggle_btn)
+
+        # About button
+        about_btn = QPushButton("i")
+        about_btn.setObjectName("HeaderIconButton")
+        about_btn.setFixedSize(32, 32)
+        about_btn.clicked.connect(self._open_about)
+        apply_tooltip(about_btn, "about")
+        layout.addWidget(about_btn)
 
         settings_btn = QPushButton("⚙")
         settings_btn.setObjectName("HeaderIconButton")
@@ -557,6 +575,7 @@ class MainWindow(QMainWindow):
         self._add_page("plantillas", self._build_template_page())
         self._add_page("historial", self._build_history_page())
         self._add_page("configuracion", self._build_settings_page())
+        self._add_page("avanzado", self._build_advanced_editable())
         layout.addWidget(self.stack, 1)
         return container
 
@@ -583,6 +602,7 @@ class MainWindow(QMainWindow):
         self.nav_items["perfiles"] = grp_tools.add_item("perfiles", "Perfiles")
         self.nav_items["glosario"] = grp_tools.add_item("glosario", "Glosario")
         self.nav_items["plantillas"] = grp_tools.add_item("plantillas", "Plantillas")
+        self.nav_items["avanzado"] = grp_tools.add_item("avanzado", "Avanzado")
         layout.addWidget(grp_tools)
 
         # Group: Historial
@@ -940,6 +960,13 @@ class MainWindow(QMainWindow):
         buttons.addWidget(json_button)
         buttons.addWidget(save_button)
         buttons.addWidget(open_button)
+
+        # Export preview button
+        preview_btn = QPushButton("Vista previa exportacion")
+        preview_btn.clicked.connect(self._open_export_preview)
+        apply_tooltip(preview_btn, "export_preview")
+        buttons.addWidget(preview_btn)
+
         buttons.addStretch(1)
         for key in ["complete_report", "compact_nsl", "json_programs", "semantic_rules", "constraints_origin"]:
             buttons.addWidget(self._help_button(key))
@@ -1108,6 +1135,39 @@ class MainWindow(QMainWindow):
     def _build_history_page(self) -> QWidget:
         return build_history_page(self)
 
+    # ─── Advanced Editable Sections page ────────────────────────────
+
+    def _build_advanced_editable(self) -> QWidget:
+        """Build the advanced editable sections page with 6 fields."""
+        self._advanced_page = AdvancedModePage()
+        self._advanced_page.compile_requested.connect(self._compile_from_advanced)
+        self._advanced_page.sections_changed.connect(self._on_advanced_sections_changed)
+        return self._advanced_page
+
+    def _compile_from_advanced(self) -> None:
+        """Compile using the advanced page's combined prompt."""
+        if not hasattr(self, '_advanced_page'):
+            return
+        combined = self._advanced_page.get_combined_prompt().strip()
+        if not combined:
+            QMessageBox.warning(self, "Entrada vacia",
+                                "Escribe algo en las secciones o pega un prompt informal antes de compilar.")
+            return
+        # Set the combined prompt into the extreme mode's prompt edit
+        self.prompt_edit.setPlainText(combined)
+        # Also sync to simple mode
+        if hasattr(self, 'simple_prompt_edit'):
+            self.simple_prompt_edit.blockSignals(True)
+            self.simple_prompt_edit.setPlainText(combined)
+            self.simple_prompt_edit.blockSignals(False)
+        # Switch to compile page and compile
+        self._select_page("compilar")
+        self.compile_current()
+
+    def _on_advanced_sections_changed(self, data: dict) -> None:
+        """Track unsaved changes in advanced sections."""
+        self._advanced_sections_dirty = True
+
     # ─── Page management ───────────────────────────────────────────
 
     def _add_page(self, name: str, widget: QWidget) -> None:
@@ -1190,6 +1250,10 @@ class MainWindow(QMainWindow):
             self._apply_mode_visibility()
             # Ensure counters are updated immediately after mode switch (sync used blockSignals)
             self._update_counters()
+
+        # Sync prompt to advanced page whenever mode changes
+        if hasattr(self, '_advanced_page') and hasattr(self, 'prompt_edit'):
+            self._advanced_page.set_informal_input(self.prompt_edit.toPlainText())
 
         save_settings(self._collect_settings())
 
@@ -1316,6 +1380,22 @@ class MainWindow(QMainWindow):
         else:
             self._switch_to_mode(MODE_EXTREME)
             self._select_page("glosario")
+
+    def _open_about(self) -> None:
+        """Open the About dialog."""
+        lang = self.settings.get("language", "es")
+        dlg = AboutDialog(self, language=lang)
+        dlg.exec()
+
+    def _open_export_preview(self) -> None:
+        """Open the Export Preview dialog."""
+        result = getattr(self, "result", None)
+        if not result:
+            QMessageBox.information(self, "Sin resultado",
+                                    "No hay ningun resultado que previsualizar. Compila un prompt primero.")
+            return
+        dlg = ExportPreviewDialog(result, self)
+        dlg.exec()
 
     # ─── Settings persistence ──────────────────────────────────────
 

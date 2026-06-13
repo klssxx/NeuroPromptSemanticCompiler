@@ -16,6 +16,8 @@ BRIEF_TOOLTIPS = {
     "settings_reset": "Restablecer configuracion local",
     "settings": "Abrir configuracion",
     "help": "Abrir ayuda",
+    "about": "Acerca de la aplicacion",
+    "export_preview": "Previsualizar exportacion antes de guardar",
     "validation": "Ver validacion",
 }
 

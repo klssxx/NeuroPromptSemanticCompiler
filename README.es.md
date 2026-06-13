@@ -146,3 +146,7 @@ bash tools/export_source_clean.sh
 - La extracción semántica es heurística, no basada en ML.
 - La cobertura completa de textos GUI aún no está traducida al 100%; launcher, settings clave y CLI ya tienen ruta bilingüe.
 - Antes de publicar una release final conviene hacer una revisión visual humana en una sesión gráfica real, no solo con `QT_QPA_PLATFORM=offscreen`.
+
+## Licencia
+
+Este proyecto se distribuye bajo la licencia MIT. Ver `LICENSE` para más detalles.

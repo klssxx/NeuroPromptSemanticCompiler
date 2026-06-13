@@ -362,6 +362,14 @@ _TRANSLATIONS: dict[str, dict[str, str]] = {
         "es": "El prompt es muy largo",
         "en": "Prompt is very long",
     },
+    "mode.advanced.title": {
+        "es": "Modo Avanzable — Secciones editables",
+        "en": "Advanced Mode — Editable sections",
+    },
+    "about.title": {
+        "es": "Acerca de NeuroPrompt Semantic Compiler",
+        "en": "About NeuroPrompt Semantic Compiler",
+    },
 }
 
 

@@ -183,7 +183,7 @@ Las contribuciones son bienvenidas. Por favor:
 
 ## Licencia
 
-Ver `LICENSE_DECISION_REQUIRED.md` — Pendiente de elección por el propietario del proyecto.
+Este proyecto se distribuye bajo la licencia MIT. Ver `LICENSE` para mas detalles.
 
 ---
 
