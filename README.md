@@ -5,7 +5,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![PySide6 6.11+](https://img.shields.io/badge/PySide6-6.11+-green.svg)](https://www.qt.io/qt-for-python)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-103%20passed-brightgreen.svg)](#tests)
+[![Tests](https://img.shields.io/badge/tests-110%20passed-brightgreen.svg)](#tests)
 
 NeuroPrompt Semantic Compiler (NPSC) is a lightweight, **100% local** desktop application that converts rough, informal AI requests into clean, structured, versioned and exportable prompt specifications. It works offline, sends nothing to the internet, and never asks for API keys.
 
@@ -52,7 +52,7 @@ Informal request
 ### Option A — with `uv` (recommended)
 
 ```bash
-git clone https://github.com/<your-user>/NeuroPromptSemanticCompiler.git
+git clone https://github.com/klssxx/NeuroPromptSemanticCompiler.git
 cd NeuroPromptSemanticCompiler
 uv venv .venv
 uv pip install -r requirements.txt
@@ -62,7 +62,7 @@ uv pip install -r requirements.txt
 ### Option B — with a standard venv
 
 ```bash
-git clone https://github.com/<your-user>/NeuroPromptSemanticCompiler.git
+git clone https://github.com/klssxx/NeuroPromptSemanticCompiler.git
 cd NeuroPromptSemanticCompiler
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
@@ -96,7 +96,7 @@ python3 -m venv .venv
 
 ### Web demo (no install required)
 
-Open [`web-demo/index.html`](web-demo/index.html) directly in a browser, or visit the GitHub Pages URL once it is enabled for this repository.
+Open [`web-demo/index.html`](web-demo/index.html) directly in a browser, or visit the published GitHub Pages demo: https://klssxx.github.io/NeuroPromptSemanticCompiler/
 
 ---
 
@@ -124,7 +124,7 @@ NeuroPromptSemanticCompiler/
 │   ├── semantic_extractor.py  # Lightweight semantic extraction
 │   ├── token_estimator.py     # tiktoken-based token counting
 │   └── ...
-├── tests/                     # 103 passing tests (pytest)
+├── tests/                     # 110 tests passing (pytest)
 ├── examples/                  # Example informal requests
 ├── web-demo/                  # Static HTML demo
 ├── docs/                      # Additional documentation
@@ -149,7 +149,7 @@ QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/ -q
 ./scripts/smoke_test.sh
 ```
 
-Current status: **103 tests passing** (non-GUI suite). GUI widget tests are run manually on a developer machine with a display.
+Current status: **110 tests passing** (non-GUI suite). GUI widget tests are run manually on a developer machine with a display.
 
 ---
 

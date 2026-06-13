@@ -36,7 +36,7 @@ First public, portfolio-ready release of NeuroPrompt Semantic Compiler.
 
 ### Tests
 
-- **103 tests passing** (non-GUI pytest suite).
+- **110 tests passing** (non-GUI pytest suite).
 - **0 syntax errors** across all `src/` Python files.
 - GUI widget tests documented as `MANUAL_REVIEW_REQUIRED` (require `pytest-qt` and a real display).
 

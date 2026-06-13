@@ -7,7 +7,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![PySide6 6.11+](https://img.shields.io/badge/PySide6-6.11+-green.svg)](https://www.qt.io/qt-for-python)
 [![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-103%20passed-brightgreen.svg)](#validación)
+[![Tests](https://img.shields.io/badge/tests-110%20passed-brightgreen.svg)](#validación)
 
 **NeuroPrompt Semantic Compiler (NPSC)** es una aplicación de escritorio ligera y **100% local** que convierte prompts desordenados en instrucciones claras, estructuradas, versionadas y exportables. Funciona sin conexión, sin telemetría y sin claves API.
 
@@ -54,7 +54,7 @@ Petición informal
 ### Opción A — con `uv` (recomendado)
 
 ```bash
-git clone https://github.com/<tu-usuario>/NeuroPromptSemanticCompiler.git
+git clone https://github.com/klssxx/NeuroPromptSemanticCompiler.git
 cd NeuroPromptSemanticCompiler
 uv venv .venv
 uv pip install -r requirements.txt
@@ -64,7 +64,7 @@ uv pip install -r requirements.txt
 ### Opción B — con venv estándar
 
 ```bash
-git clone https://github.com/<tu-usuario>/NeuroPromptSemanticCompiler.git
+git clone https://github.com/klssxx/NeuroPromptSemanticCompiler.git
 cd NeuroPromptSemanticCompiler
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
@@ -98,7 +98,7 @@ python3 -m venv .venv
 
 ### Demo web (sin instalación)
 
-Abre [`web-demo/index.html`](web-demo/index.html) en cualquier navegador o visita la URL de GitHub Pages del repositorio cuando esté habilitada.
+Abre [`web-demo/index.html`](web-demo/index.html) en cualquier navegador o visita la demo publicada en GitHub Pages: https://klssxx.github.io/NeuroPromptSemanticCompiler/
 
 ---
 
@@ -126,7 +126,7 @@ NeuroPromptSemanticCompiler/
 │   ├── semantic_extractor.py  # Extracción semántica ligera
 │   ├── token_estimator.py     # Conteo de tokens con tiktoken
 │   └── ...
-├── tests/                     # 103 tests pasando (pytest)
+├── tests/                     # 110 tests pasando (pytest)
 ├── examples/                  # Ejemplos de peticiones informales
 ├── web-demo/                  # Demo HTML estática
 ├── docs/                      # Documentación adicional
@@ -151,7 +151,7 @@ QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/ -q
 ./scripts/smoke_test.sh
 ```
 
-Estado actual: **103 tests pasando** (suite no-GUI). Los tests de widgets GUI se ejecutan manualmente con un display real.
+Estado actual: **110 tests pasando** (suite no-GUI). Los tests de widgets GUI se ejecutan manualmente con un display real.
 
 ---
 
