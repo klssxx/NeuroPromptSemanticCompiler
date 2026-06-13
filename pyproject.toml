@@ -1,0 +1,67 @@
+[project]
+name = "neuroprompt-semantic-compiler"
+version = "1.0.0rc2"
+description = "Semantic prompt compiler that converts messy prompts into NSL and reconstructed model-ready instructions."
+requires-python = ">=3.10"
+readme = "README.md"
+authors = [{name = "NeuroPrompt Team"}]
+dependencies = ["PySide6>=6.11"]
+
+[project.scripts]
+npsc = "npsc_cli:run_cli"
+npsc-gui = "npsc_gui.main:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = [
+  "benchmark_quality",
+  "compilation_profiles",
+  "compiler_defaults",
+  "constraint_normalizer",
+  "context_loss_verifier",
+  "exporters",
+  "hybrid_output",
+  "i18n",
+  "model_adapter",
+  "npsc_cli",
+  "npsc_service",
+  "nsl_compiler",
+  "nsl_parser",
+  "profile_selector",
+  "prompt_reconstructor",
+  "report_builder",
+  "resource_paths",
+  "rop_template",
+  "semantic_dictionary",
+  "semantic_extractor",
+  "semantic_ir",
+  "semantic_seed_mapper",
+  "token_estimator",
+  "utils"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+npsc_resources = ["configs/*.json", "assets/icons/*.svg"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [
+  ".venv",
+  "dist",
+  "build",
+  "backups",
+  "_backups",
+  "outputs",
+  "staging",
+  "*.egg-info",
+  ".pytest_cache",
+  "__pycache__"
+]
+python_files = ["test_*.py"]

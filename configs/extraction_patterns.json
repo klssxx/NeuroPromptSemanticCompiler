@@ -1,0 +1,132 @@
+{
+  "roles": [
+    "arquitecto",
+    "architect",
+    "senior",
+    "engineer",
+    "researcher",
+    "prompt engineer",
+    "qa",
+    "reviewer",
+    "linux"
+  ],
+  "goal_markers": [
+    "quiero",
+    "necesito",
+    "objetivo",
+    "goal",
+    "build",
+    "create",
+    "hacer",
+    "desarrollar",
+    "compiler"
+  ],
+  "task_markers": [
+    "detectar",
+    "convertir",
+    "map",
+    "compile",
+    "reconstruct",
+    "verify",
+    "export",
+    "test",
+    "generar"
+  ],
+  "constraint_markers": [
+    "sin sudo",
+    "no sudo",
+    "no api",
+    "sin api",
+    "no external api",
+    "no tocar fuera",
+    "stay inside",
+    "no destructive",
+    "nada destructivo",
+    "offline",
+    "local"
+  ],
+  "priority_markers": [
+    "prioridad",
+    "primero",
+    "above",
+    "over",
+    "más importante",
+    "must"
+  ],
+  "output_markers": [
+    "reportes",
+    "reports",
+    "tests",
+    "files",
+    "cli",
+    "json",
+    "markdown",
+    "output"
+  ],
+  "target_markers": {
+    "codex": [
+      "codex",
+      "gpt-5.3-codex"
+    ],
+    "hermes": [
+      "hermes"
+    ],
+    "gpt": [
+      "gpt",
+      "openai"
+    ],
+    "claude": [
+      "claude",
+      "anthropic"
+    ],
+    "gemini": [
+      "gemini"
+    ],
+    "qwen": [
+      "qwen"
+    ],
+    "deepseek": [
+      "deepseek"
+    ],
+    "llama": [
+      "llama",
+      "ollama"
+    ],
+    "mistral": [
+      "mistral"
+    ]
+  },
+  "safety_map": {
+    "no_sudo": [
+      "sin sudo",
+      "no sudo"
+    ],
+    "no_external_api": [
+      "sin api",
+      "no api",
+      "no external api",
+      "sin APIs"
+    ],
+    "no_destructive_actions": [
+      "no destructive",
+      "nada destructivo",
+      "no borrar",
+      "no delete"
+    ],
+    "stay_inside_project_root": [
+      "no tocar fuera",
+      "stay inside",
+      "inside root",
+      "dentro del proyecto",
+      "sin tocar fuera del proyecto",
+      "fuera del proyecto",
+      "inside project root",
+      "within project root"
+    ],
+    "offline_only": [
+      "offline",
+      "sin internet",
+      "no internet"
+    ]
+  }
+}

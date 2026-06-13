@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.npsc.NeuroPromptSemanticCompiler</id>
+  <name>NeuroPrompt Semantic Compiler</name>
+  <summary>Compile human prompts into structured semantic outputs for AI</summary>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <developer id="io.github.npsc">
+    <name>NeuroPrompt Team</name>
+  </developer>
+  <url type="homepage">https://github.com/klsx/NeuroPromptSemanticCompiler</url>
+  <description>
+    <p>NeuroPrompt Semantic Compiler is an offline desktop and CLI tool that preserves the original prompt, generates canonical NSL, hybrid Markdown, machine-oriented JSON and context-loss validation reports.</p>
+    <p>It supports FAST, STANDARD, ADVANCED, ROP, RESEARCH_MAX and AUTO semantic compilation profiles.</p>
+  </description>
+  <launchable type="desktop-id">neuro-prompt-semantic-compiler.desktop</launchable>
+  <provides>
+    <binary>npsc-gui</binary>
+  </provides>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="1.0.0rc2" date="2026-06-09" />
+  </releases>
+</component>

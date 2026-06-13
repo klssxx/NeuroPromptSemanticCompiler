@@ -1,0 +1,358 @@
+{
+  "schema": "compilation_profiles.v1",
+  "default_profile": "STANDARD",
+  "supported_profiles": [
+    "FAST",
+    "STANDARD",
+    "ADVANCED",
+    "ROP",
+    "RESEARCH_MAX",
+    "AUTO"
+  ],
+  "profiles": {
+    "FAST": {
+      "label": "FAST",
+      "purpose": "Compact semantic compilation for simple prompts.",
+      "output_length": "short",
+      "verbosity": "low",
+      "compression": "high",
+      "technical_level": "aggressive",
+      "seed_limit": 3,
+      "validation": {
+        "mode": "light",
+        "min_score": 55,
+        "fail_on_critical_loss": true,
+        "fail_on_warnings": false
+      },
+      "use_cases": [
+        "simple prompts",
+        "quick rewriting",
+        "low-risk tasks",
+        "short requests"
+      ],
+      "prompt_directives": [
+        "Keep only essential intent, constraints and deliverables.",
+        "Prefer compact wording over extended explanation.",
+        "Warn on context loss but fail only on critical losses."
+      ]
+    },
+    "STANDARD": {
+      "label": "STANDARD",
+      "purpose": "Default balanced semantic compilation.",
+      "output_length": "medium",
+      "verbosity": "normal",
+      "compression": "medium",
+      "technical_level": "balanced",
+      "seed_limit": 22,
+      "validation": {
+        "mode": "normal",
+        "min_score": 70,
+        "fail_on_critical_loss": true,
+        "fail_on_warnings": false
+      },
+      "use_cases": [
+        "general prompts",
+        "balanced clarity",
+        "default operation"
+      ],
+      "prompt_directives": [
+        "Preserve objective, constraints, outputs and useful context.",
+        "Use readable structure with moderate compression.",
+        "Keep verification visible."
+      ]
+    },
+    "ADVANCED": {
+      "label": "ADVANCED",
+      "purpose": "High-preservation semantic compilation for technical or complex work.",
+      "output_length": "structured",
+      "verbosity": "high",
+      "compression": "medium-low",
+      "technical_level": "safe",
+      "seed_limit": 30,
+      "validation": {
+        "mode": "strong",
+        "min_score": 82,
+        "fail_on_critical_loss": true,
+        "fail_on_warnings": false,
+        "required_fields": [
+          "goal",
+          "constraints",
+          "output"
+        ]
+      },
+      "use_cases": [
+        "code",
+        "architecture",
+        "documentation",
+        "apps",
+        "systems",
+        "technical debugging",
+        "complex tasks"
+      ],
+      "prompt_directives": [
+        "Preserve more context than FAST or STANDARD.",
+        "Expose tasks, constraints, output contract, verification and risks.",
+        "Prefer explicit structure over token minimization."
+      ]
+    },
+    "ROP": {
+      "label": "ROP",
+      "purpose": "Reality Optimization Protocol for strategic, adversarial and decision-oriented analysis.",
+      "output_length": "strategic",
+      "verbosity": "high",
+      "compression": "selective",
+      "technical_level": "safe",
+      "seed_limit": 34,
+      "validation": {
+        "mode": "rop_strict",
+        "min_score": 84,
+        "fail_on_critical_loss": true,
+        "required_markers": [
+          "reasoning_protocol",
+          "adversarial_review",
+          "expected improvement",
+          "self_audit",
+          "output_schema"
+        ]
+      },
+      "use_cases": [
+        "Reality Optimization Protocol",
+        "strategic reasoning",
+        "hypotheses",
+        "falsification",
+        "scenarios",
+        "dominant variables",
+        "evidence",
+        "convergence",
+        "self-critique"
+      ],
+      "prompt_directives": [
+        "Use ROP only when selected or automatically justified.",
+        "Prefer truth, prediction, robustness, utility and actionability.",
+        "Separate evidence levels and do not mix certainty classes."
+      ],
+      "rop_template": {
+        "VERSION": "ROP/1.0",
+        "ROLE": "Reality-Oriented Optimization Engine",
+        "PRIMARY_OBJECTIVES": [
+          "Truth Approximation",
+          "Predictive Power",
+          "Practical Utility",
+          "Robustness",
+          "Actionability"
+        ],
+        "SECONDARY_OBJECTIVES": [
+          "Adaptability",
+          "Clarity of tradeoffs",
+          "Useful uncertainty reporting",
+          "Decision quality"
+        ],
+        "MISSION": {
+          "maximize": [
+            "Truth Approximation",
+            "Predictive Power",
+            "Practical Utility",
+            "Robustness",
+            "Adaptability"
+          ],
+          "minimize": [
+            "Popularity Bias",
+            "Consensus Bias",
+            "Narrative Bias",
+            "Authority Bias",
+            "Emotional Validation Bias",
+            "Survivorship Bias",
+            "Complexity Inflation",
+            "Overconfidence"
+          ]
+        },
+        "QUERY": "[INPUT]",
+        "REASONING_PROTOCOL": [
+          "Generate alternatives",
+          "Evaluate assumptions",
+          "Falsify conclusions",
+          "Search counterarguments",
+          "Detect missing variables",
+          "Detect information gaps",
+          "Refine",
+          "Stop when Expected Improvement < Complexity Cost",
+          "STOP_IF[EXPECTED_IMPROVEMENT < COMPLEXITY_COST]"
+        ],
+        "PROBLEM_MODEL": [
+          "Explicit objectives",
+          "Implicit objectives",
+          "Real constraints",
+          "Assumed constraints",
+          "Missing information",
+          "Critical unknowns"
+        ],
+        "INFORMATION_VALUE": [
+          "Highest value unknown",
+          "Dominant uncertainties",
+          "Information gain ranking"
+        ],
+        "SYSTEM_MAP": [
+          "Dominant variables",
+          "Hidden variables",
+          "Dependencies",
+          "Bottlenecks",
+          "Leverage points",
+          "Failure points",
+          "Invariants"
+        ],
+        "EVIDENCE_MODEL": [
+          "Level A: replicated facts",
+          "Level B: strong evidence",
+          "Level C: moderate evidence",
+          "Level D: plausible hypothesis",
+          "Level E: reasoned speculation",
+          "Level F: unknown",
+          "Do not mix levels"
+        ],
+        "ANALYSIS_MODELS": [
+          "Use only if relevant",
+          "Mathematics",
+          "Probability",
+          "Bayes",
+          "Statistics",
+          "Optimization",
+          "Game Theory",
+          "Economics",
+          "Engineering",
+          "Systems",
+          "Evolution",
+          "Biology",
+          "Psychology",
+          "Strategy",
+          "Complex Systems"
+        ],
+        "HYPOTHESIS_ENGINE": [
+          "Primary",
+          "Alternative",
+          "Contrarian",
+          "Low probability / high impact",
+          "Ignored path"
+        ],
+        "ADVERSARIAL_REVIEW": [
+          "Falsification",
+          "Contradiction search",
+          "Causal error scan",
+          "Assumption scan",
+          "Bias scan",
+          "Survivorship scan",
+          "Overconfidence scan"
+        ],
+        "SCENARIO_ENGINE": {
+          "scenarios": [
+            "Worst case",
+            "Base case",
+            "Best case",
+            "Disruptive case",
+            "Black swan case"
+          ],
+          "per_scenario": [
+            "Probability",
+            "Impact",
+            "Triggers",
+            "Risks",
+            "Opportunities"
+          ]
+        },
+        "COMPRESSION": [
+          "Core principles",
+          "Dominant variables",
+          "Critical decisions",
+          "Remove nonessential complexity"
+        ],
+        "TRUTH_MODE": "If conclusion conflicts with user expectations, prefer the most supported conclusion.",
+        "SELF_AUDIT": [
+          "What invalidates conclusion?",
+          "Strongest counterargument",
+          "Highest uncertainty",
+          "Missing evidence",
+          "Overconfidence risk",
+          "Is simple better than complex?"
+        ],
+        "OUTPUT_SCHEMA": [
+          "1. Conclusion",
+          "2. Reality Model",
+          "3. Dominant Variables",
+          "4. Hidden Risks",
+          "5. Hidden Opportunities",
+          "6. Scenario Matrix",
+          "7. Option Ranking",
+          "8. Recommended Action",
+          "9. Failure Conditions",
+          "10. Confidence Score [0-100]"
+        ],
+        "SUPREME_RULE": [
+          "Do not optimize for length.",
+          "Do not optimize for appearance.",
+          "Do not optimize for consensus.",
+          "Optimize for truth, utility, prediction, robustness and actionability."
+        ]
+      }
+    },
+    "RESEARCH_MAX": {
+      "label": "RESEARCH_MAX",
+      "purpose": "Maximum semantic preservation for research, strategy, risks and important decisions.",
+      "output_length": "extensive_structured",
+      "verbosity": "maximum",
+      "compression": "low",
+      "technical_level": "safe",
+      "seed_limit": 40,
+      "validation": {
+        "mode": "strict",
+        "min_score": 90,
+        "fail_on_critical_loss": true,
+        "fail_on_warnings": true,
+        "required_fields": [
+          "goal",
+          "context",
+          "tasks",
+          "constraints",
+          "output",
+          "risks"
+        ]
+      },
+      "use_cases": [
+        "deep research",
+        "business",
+        "strategy",
+        "risk analysis",
+        "important decisions",
+        "complex planning",
+        "multi-agent systems",
+        "advanced systems"
+      ],
+      "prompt_directives": [
+        "Maximize preservation and minimize semantic loss.",
+        "Keep original nuance, constraints, objectives, expected output and critical context visible.",
+        "Use strict validation and explicit uncertainty reporting."
+      ]
+    },
+    "AUTO": {
+      "label": "AUTO",
+      "purpose": "Automatic selector based on task type, length, risk, complexity, constraints, evidence needs and context-loss risk.",
+      "output_length": "selected",
+      "verbosity": "selected",
+      "compression": "selected",
+      "technical_level": "balanced",
+      "seed_limit": 22,
+      "validation": {
+        "mode": "selected",
+        "min_score": 70,
+        "fail_on_critical_loss": true
+      },
+      "selection_criteria": [
+        "task type",
+        "prompt length",
+        "risk level",
+        "complexity",
+        "number of restrictions",
+        "need for evidence",
+        "possible context loss"
+      ]
+    }
+  }
+}

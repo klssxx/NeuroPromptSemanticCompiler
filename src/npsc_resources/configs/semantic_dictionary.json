@@ -1,0 +1,3194 @@
+[
+  {
+    "id": "S001",
+    "name": "senior_expert_role",
+    "meaning": "Act as a senior expert in the requested domain.",
+    "compact": "senior-expert-role",
+    "expansion": "Act as a senior expert in the requested domain. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 79
+  },
+  {
+    "id": "S002",
+    "name": "system_architect_role",
+    "meaning": "Act as a principal system architect with implementation awareness.",
+    "compact": "system-architect-role",
+    "expansion": "Act as a principal system architect with implementation awareness. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 78
+  },
+  {
+    "id": "S003",
+    "name": "researcher_role",
+    "meaning": "Act as a rigorous researcher focused on evidence and method.",
+    "compact": "researcher-role",
+    "expansion": "Act as a rigorous researcher focused on evidence and method. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 77
+  },
+  {
+    "id": "S004",
+    "name": "codex_engineer_role",
+    "meaning": "Act as a code-focused engineer for concrete implementation.",
+    "compact": "codex-engineer-role",
+    "expansion": "Act as a code-focused engineer for concrete implementation. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 76
+  },
+  {
+    "id": "S005",
+    "name": "linux_engineer_role",
+    "meaning": "Act as a local Linux engineer with safe operational judgment.",
+    "compact": "linux-engineer-role",
+    "expansion": "Act as a local Linux engineer with safe operational judgment. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 75
+  },
+  {
+    "id": "S006",
+    "name": "prompt_engineer_role",
+    "meaning": "Act as a prompt language designer with semantic precision.",
+    "compact": "prompt-engineer-role",
+    "expansion": "Act as a prompt language designer with semantic precision. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 74
+  },
+  {
+    "id": "S007",
+    "name": "qa_reviewer_role",
+    "meaning": "Act as QA reviewer validating regressions and risks.",
+    "compact": "qa-reviewer-role",
+    "expansion": "Act as QA reviewer validating regressions and risks. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 73
+  },
+  {
+    "id": "S008",
+    "name": "security_reviewer_role",
+    "meaning": "Act as security reviewer for boundaries and non-destructive behavior.",
+    "compact": "security-reviewer-role",
+    "expansion": "Act as security reviewer for boundaries and non-destructive behavior. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 72
+  },
+  {
+    "id": "S009",
+    "name": "compiler_builder_role",
+    "meaning": "Act as a compiler builder for deterministic transformations.",
+    "compact": "compiler-builder-role",
+    "expansion": "Act as a compiler builder for deterministic transformations. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 71
+  },
+  {
+    "id": "S010",
+    "name": "semantic_compressor_role",
+    "meaning": "Act as semantic compression specialist preserving intent.",
+    "compact": "semantic-compressor-role",
+    "expansion": "Act as semantic compression specialist preserving intent. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "role",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 80
+  },
+  {
+    "id": "S011",
+    "name": "preserve_user_intent",
+    "meaning": "Preserve original user intent while removing noise.",
+    "compact": "preserve-user-intent",
+    "expansion": "Preserve original user intent while removing noise. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 89
+  },
+  {
+    "id": "S012",
+    "name": "extract_primary_goal",
+    "meaning": "Extract explicit and implicit main goals.",
+    "compact": "extract-primary-goal",
+    "expansion": "Extract explicit and implicit main goals. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 88
+  },
+  {
+    "id": "S013",
+    "name": "extract_tasks",
+    "meaning": "Extract concrete action tasks from natural language.",
+    "compact": "extract-tasks",
+    "expansion": "Extract concrete action tasks from natural language. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 87
+  },
+  {
+    "id": "S014",
+    "name": "detect_ambiguity",
+    "meaning": "Detect ambiguity and mark unresolved decisions.",
+    "compact": "detect-ambiguity",
+    "expansion": "Detect ambiguity and mark unresolved decisions. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 86
+  },
+  {
+    "id": "S015",
+    "name": "infer_structure_no_fabrication",
+    "meaning": "Infer missing structure without inventing facts.",
+    "compact": "infer-structure-no-fabrication",
+    "expansion": "Infer missing structure without inventing facts. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 85
+  },
+  {
+    "id": "S016",
+    "name": "identify_non_negotiables",
+    "meaning": "Identify non-negotiable constraints and safety clauses.",
+    "compact": "identify-non-negotiables",
+    "expansion": "Identify non-negotiable constraints and safety clauses. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 84
+  },
+  {
+    "id": "S017",
+    "name": "normalize_objectives",
+    "meaning": "Normalize goals into executable objective statements.",
+    "compact": "normalize-objectives",
+    "expansion": "Normalize goals into executable objective statements. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 83
+  },
+  {
+    "id": "S018",
+    "name": "separate_context_from_tasks",
+    "meaning": "Separate context/background from actionable tasks.",
+    "compact": "separate-context-from-tasks",
+    "expansion": "Separate context/background from actionable tasks. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 82
+  },
+  {
+    "id": "S019",
+    "name": "extract_output_contract",
+    "meaning": "Extract expected deliverables and output contracts.",
+    "compact": "extract-output-contract",
+    "expansion": "Extract expected deliverables and output contracts. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 81
+  },
+  {
+    "id": "S020",
+    "name": "extract_target_model",
+    "meaning": "Detect intended target model or runtime profile.",
+    "compact": "extract-target-model",
+    "expansion": "Detect intended target model or runtime profile. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 90
+  },
+  {
+    "id": "S021",
+    "name": "no_sudo",
+    "meaning": "Never use sudo or privileged escalation.",
+    "compact": "no-sudo",
+    "expansion": "Never use sudo or privileged escalation. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 94
+  },
+  {
+    "id": "S022",
+    "name": "no_external_api",
+    "meaning": "No calls to external APIs or cloud inference.",
+    "compact": "no-external-api",
+    "expansion": "No calls to external APIs or cloud inference. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 93
+  },
+  {
+    "id": "S023",
+    "name": "no_destructive_actions",
+    "meaning": "No destructive filesystem or system commands.",
+    "compact": "no-destructive-actions",
+    "expansion": "No destructive filesystem or system commands. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 92
+  },
+  {
+    "id": "S024",
+    "name": "local_first",
+    "meaning": "Keep all execution local-first and reproducible.",
+    "compact": "local-first",
+    "expansion": "Keep all execution local-first and reproducible. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 91
+  },
+  {
+    "id": "S025",
+    "name": "stay_inside_root",
+    "meaning": "Never modify files outside project root.",
+    "compact": "stay-inside-root",
+    "expansion": "Never modify files outside project root. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 90
+  },
+  {
+    "id": "S026",
+    "name": "human_review_required",
+    "meaning": "Require human review for risky outputs.",
+    "compact": "human-review-required",
+    "expansion": "Require human review for risky outputs. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 89
+  },
+  {
+    "id": "S027",
+    "name": "no_hidden_instructions",
+    "meaning": "Do not hide critical instructions from user visibility.",
+    "compact": "no-hidden-instructions",
+    "expansion": "Do not hide critical instructions from user visibility. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 88
+  },
+  {
+    "id": "S028",
+    "name": "explicit_safety_retention",
+    "meaning": "Safety constraints must survive every transformation.",
+    "compact": "explicit-safety-retention",
+    "expansion": "Safety constraints must survive every transformation. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 87
+  },
+  {
+    "id": "S029",
+    "name": "offline_execution",
+    "meaning": "Prefer offline execution pathways.",
+    "compact": "offline-execution",
+    "expansion": "Prefer offline execution pathways. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 86
+  },
+  {
+    "id": "S030",
+    "name": "audit_trail",
+    "meaning": "Maintain traceable artifacts for review and audit.",
+    "compact": "audit-trail",
+    "expansion": "Maintain traceable artifacts for review and audit. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 95
+  },
+  {
+    "id": "S031",
+    "name": "quality_over_speed",
+    "meaning": "Prioritize quality and correctness over speed.",
+    "compact": "quality-over-speed",
+    "expansion": "Prioritize quality and correctness over speed. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 79
+  },
+  {
+    "id": "S032",
+    "name": "clarity_first",
+    "meaning": "Keep outputs clear and operationally readable.",
+    "compact": "clarity-first",
+    "expansion": "Keep outputs clear and operationally readable. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 78
+  },
+  {
+    "id": "S033",
+    "name": "auditability",
+    "meaning": "Ensure decisions are auditable from produced artifacts.",
+    "compact": "auditability",
+    "expansion": "Ensure decisions are auditable from produced artifacts. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 77
+  },
+  {
+    "id": "S034",
+    "name": "reproducibility",
+    "meaning": "Outputs should be reproducible with deterministic flow.",
+    "compact": "reproducibility",
+    "expansion": "Outputs should be reproducible with deterministic flow. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 76
+  },
+  {
+    "id": "S035",
+    "name": "verification_required",
+    "meaning": "Verification is mandatory before claiming success.",
+    "compact": "verification-required",
+    "expansion": "Verification is mandatory before claiming success. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 75
+  },
+  {
+    "id": "S036",
+    "name": "test_coverage",
+    "meaning": "Include tests for critical behavior.",
+    "compact": "test-coverage",
+    "expansion": "Include tests for critical behavior. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 74
+  },
+  {
+    "id": "S037",
+    "name": "documentation_required",
+    "meaning": "Generate practical documentation for usage.",
+    "compact": "documentation-required",
+    "expansion": "Generate practical documentation for usage. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 73
+  },
+  {
+    "id": "S038",
+    "name": "maintainability",
+    "meaning": "Design modules for maintainability and extension.",
+    "compact": "maintainability",
+    "expansion": "Design modules for maintainability and extension. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 72
+  },
+  {
+    "id": "S039",
+    "name": "explicit_failure_reporting",
+    "meaning": "Report failures honestly with actionable context.",
+    "compact": "explicit-failure-reporting",
+    "expansion": "Report failures honestly with actionable context. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 71
+  },
+  {
+    "id": "S040",
+    "name": "bounded_scope",
+    "meaning": "Respect bounded scope and avoid uncontrolled expansion.",
+    "compact": "bounded-scope",
+    "expansion": "Respect bounded scope and avoid uncontrolled expansion. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "quality",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 80
+  },
+  {
+    "id": "S041",
+    "name": "semantic_compression",
+    "meaning": "Compress semantics, not meaning.",
+    "compact": "semantic-compression",
+    "expansion": "Compress semantics, not meaning. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 79
+  },
+  {
+    "id": "S042",
+    "name": "remove_noise",
+    "meaning": "Remove filler and duplicated phrasing.",
+    "compact": "remove-noise",
+    "expansion": "Remove filler and duplicated phrasing. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 78
+  },
+  {
+    "id": "S043",
+    "name": "preserve_constraints",
+    "meaning": "Preserve constraints through compaction.",
+    "compact": "preserve-constraints",
+    "expansion": "Preserve constraints through compaction. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 77
+  },
+  {
+    "id": "S044",
+    "name": "compact_structure",
+    "meaning": "Use compact deterministic structure (NSL).",
+    "compact": "compact-structure",
+    "expansion": "Use compact deterministic structure (NSL). Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 76
+  },
+  {
+    "id": "S045",
+    "name": "seed_mapping",
+    "meaning": "Map semantics to reusable seed references.",
+    "compact": "seed-mapping",
+    "expansion": "Map semantics to reusable seed references. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 75
+  },
+  {
+    "id": "S046",
+    "name": "prompt_by_reference",
+    "meaning": "Use semantic references for repeated concepts.",
+    "compact": "prompt-by-reference",
+    "expansion": "Use semantic references for repeated concepts. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 74
+  },
+  {
+    "id": "S047",
+    "name": "anti_overcompression",
+    "meaning": "Prevent overcompression that loses mission-critical intent.",
+    "compact": "anti-overcompression",
+    "expansion": "Prevent overcompression that loses mission-critical intent. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 73
+  },
+  {
+    "id": "S048",
+    "name": "priority_driven_compaction",
+    "meaning": "Preserve high-priority chains before compressing.",
+    "compact": "priority-driven-compaction",
+    "expansion": "Preserve high-priority chains before compressing. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 72
+  },
+  {
+    "id": "S049",
+    "name": "mode_aware_compilation",
+    "meaning": "Adjust compaction by safe/balanced/aggressive mode.",
+    "compact": "mode-aware-compilation",
+    "expansion": "Adjust compaction by safe/balanced/aggressive mode. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 71
+  },
+  {
+    "id": "S050",
+    "name": "readability_guard",
+    "meaning": "Keep compact output still understandable by humans.",
+    "compact": "readability-guard",
+    "expansion": "Keep compact output still understandable by humans. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "compression",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 80
+  },
+  {
+    "id": "S051",
+    "name": "actionable_output",
+    "meaning": "Produce actionable output, not abstract commentary.",
+    "compact": "actionable-output",
+    "expansion": "Produce actionable output, not abstract commentary. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 79
+  },
+  {
+    "id": "S052",
+    "name": "file_generation",
+    "meaning": "Generate required files and artifacts.",
+    "compact": "file-generation",
+    "expansion": "Generate required files and artifacts. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 78
+  },
+  {
+    "id": "S053",
+    "name": "command_generation",
+    "meaning": "Provide runnable local commands when requested.",
+    "compact": "command-generation",
+    "expansion": "Provide runnable local commands when requested. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 77
+  },
+  {
+    "id": "S054",
+    "name": "report_generation",
+    "meaning": "Generate markdown and JSON reports.",
+    "compact": "report-generation",
+    "expansion": "Generate markdown and JSON reports. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 76
+  },
+  {
+    "id": "S055",
+    "name": "nsl_output",
+    "meaning": "Emit NSL compilations for each mode.",
+    "compact": "nsl-output",
+    "expansion": "Emit NSL compilations for each mode. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 75
+  },
+  {
+    "id": "S056",
+    "name": "cli_output",
+    "meaning": "Provide concise CLI execution summary.",
+    "compact": "cli-output",
+    "expansion": "Provide concise CLI execution summary. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 74
+  },
+  {
+    "id": "S057",
+    "name": "final_summary",
+    "meaning": "Provide final operational summary and status.",
+    "compact": "final-summary",
+    "expansion": "Provide final operational summary and status. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 73
+  },
+  {
+    "id": "S058",
+    "name": "acceptance_contract",
+    "meaning": "Include acceptance criteria and completion checks.",
+    "compact": "acceptance-contract",
+    "expansion": "Include acceptance criteria and completion checks. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 72
+  },
+  {
+    "id": "S059",
+    "name": "traceability_outputs",
+    "meaning": "Output must support traceability and validation.",
+    "compact": "traceability-outputs",
+    "expansion": "Output must support traceability and validation. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 71
+  },
+  {
+    "id": "S060",
+    "name": "artifact_consistency",
+    "meaning": "Keep artifact names and schemas consistent.",
+    "compact": "artifact-consistency",
+    "expansion": "Keep artifact names and schemas consistent. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "output",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 80
+  },
+  {
+    "id": "S061",
+    "name": "gpt_compatibility",
+    "meaning": "Adapt prompts for GPT-style execution.",
+    "compact": "gpt-compatibility",
+    "expansion": "Adapt prompts for GPT-style execution. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 79
+  },
+  {
+    "id": "S062",
+    "name": "codex_compatibility",
+    "meaning": "Adapt prompts for Codex operational flow.",
+    "compact": "codex-compatibility",
+    "expansion": "Adapt prompts for Codex operational flow. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 78
+  },
+  {
+    "id": "S063",
+    "name": "hermes_compatibility",
+    "meaning": "Adapt prompts for Hermes safety phases.",
+    "compact": "hermes-compatibility",
+    "expansion": "Adapt prompts for Hermes safety phases. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 77
+  },
+  {
+    "id": "S064",
+    "name": "claude_compatibility",
+    "meaning": "Adapt prompts for Claude structured reasoning.",
+    "compact": "claude-compatibility",
+    "expansion": "Adapt prompts for Claude structured reasoning. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 76
+  },
+  {
+    "id": "S065",
+    "name": "local_model_compatibility",
+    "meaning": "Adapt for lower-context local models.",
+    "compact": "local-model-compatibility",
+    "expansion": "Adapt for lower-context local models. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 75
+  },
+  {
+    "id": "S066",
+    "name": "generic_safe_format",
+    "meaning": "Provide generic safe structure for unknown models.",
+    "compact": "generic-safe-format",
+    "expansion": "Provide generic safe structure for unknown models. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 74
+  },
+  {
+    "id": "S067",
+    "name": "gemini_compatibility",
+    "meaning": "Adapt to Gemini section-friendly format.",
+    "compact": "gemini-compatibility",
+    "expansion": "Adapt to Gemini section-friendly format. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 73
+  },
+  {
+    "id": "S068",
+    "name": "qwen_compatibility",
+    "meaning": "Adapt to explicit stepwise format for Qwen.",
+    "compact": "qwen-compatibility",
+    "expansion": "Adapt to explicit stepwise format for Qwen. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 72
+  },
+  {
+    "id": "S069",
+    "name": "deepseek_compatibility",
+    "meaning": "Adapt to task and constraint first structure.",
+    "compact": "deepseek-compatibility",
+    "expansion": "Adapt to task and constraint first structure. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 71
+  },
+  {
+    "id": "S070",
+    "name": "mistral_compatibility",
+    "meaning": "Adapt to compact explicit instruction format.",
+    "compact": "mistral-compatibility",
+    "expansion": "Adapt to compact explicit instruction format. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic"
+    ],
+    "priority": 80
+  },
+  {
+    "id": "S071",
+    "name": "project_structure",
+    "meaning": "Create consistent local project structure.",
+    "compact": "project-structure",
+    "expansion": "Create consistent local project structure. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 79
+  },
+  {
+    "id": "S072",
+    "name": "python_cli",
+    "meaning": "Implement Python CLI with argparse.",
+    "compact": "python-cli",
+    "expansion": "Implement Python CLI with argparse. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 78
+  },
+  {
+    "id": "S073",
+    "name": "pathlib_usage",
+    "meaning": "Use pathlib for robust filesystem handling.",
+    "compact": "pathlib-usage",
+    "expansion": "Use pathlib for robust filesystem handling. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 77
+  },
+  {
+    "id": "S074",
+    "name": "json_configs",
+    "meaning": "Use JSON configs for dictionaries and profiles.",
+    "compact": "json-configs",
+    "expansion": "Use JSON configs for dictionaries and profiles. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 76
+  },
+  {
+    "id": "S075",
+    "name": "unittest_suite",
+    "meaning": "Use unittest for deterministic test coverage.",
+    "compact": "unittest-suite",
+    "expansion": "Use unittest for deterministic test coverage. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 75
+  },
+  {
+    "id": "S076",
+    "name": "bash_tooling",
+    "meaning": "Provide bash scripts for demo and verification.",
+    "compact": "bash-tooling",
+    "expansion": "Provide bash scripts for demo and verification. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 74
+  },
+  {
+    "id": "S077",
+    "name": "config_driven_design",
+    "meaning": "Design behavior via configurable rules and profiles.",
+    "compact": "config-driven-design",
+    "expansion": "Design behavior via configurable rules and profiles. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 73
+  },
+  {
+    "id": "S078",
+    "name": "no_global_install",
+    "meaning": "Avoid global installs and keep local execution.",
+    "compact": "no-global-install",
+    "expansion": "Avoid global installs and keep local execution. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 72
+  },
+  {
+    "id": "S079",
+    "name": "offline_friendly_stack",
+    "meaning": "Prefer standard library and offline-friendly tools.",
+    "compact": "offline-friendly-stack",
+    "expansion": "Prefer standard library and offline-friendly tools. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 71
+  },
+  {
+    "id": "S080",
+    "name": "deterministic_pipeline",
+    "meaning": "Preserve deterministic transformation pipeline.",
+    "compact": "deterministic-pipeline",
+    "expansion": "Preserve deterministic transformation pipeline. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "software",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 80
+  },
+  {
+    "id": "S081",
+    "name": "optimized_prompt_generation",
+    "meaning": "Generate optimized target prompt from NSL.",
+    "compact": "optimized-prompt-generation",
+    "expansion": "Generate optimized target prompt from NSL. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 89
+  },
+  {
+    "id": "S082",
+    "name": "target_specific_adapter",
+    "meaning": "Apply target profile specific reconstruction rules.",
+    "compact": "target-specific-adapter",
+    "expansion": "Apply target profile specific reconstruction rules. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 88
+  },
+  {
+    "id": "S083",
+    "name": "operational_instructions",
+    "meaning": "Produce operationally concrete instructions.",
+    "compact": "operational-instructions",
+    "expansion": "Produce operationally concrete instructions. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 87
+  },
+  {
+    "id": "S084",
+    "name": "acceptance_criteria",
+    "meaning": "Embed acceptance criteria in reconstructed prompt.",
+    "compact": "acceptance-criteria",
+    "expansion": "Embed acceptance criteria in reconstructed prompt. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 86
+  },
+  {
+    "id": "S085",
+    "name": "final_response_contract",
+    "meaning": "Specify expected final answer contract.",
+    "compact": "final-response-contract",
+    "expansion": "Specify expected final answer contract. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 85
+  },
+  {
+    "id": "S086",
+    "name": "safety_echo",
+    "meaning": "Echo critical safety constraints in output prompt.",
+    "compact": "safety-echo",
+    "expansion": "Echo critical safety constraints in output prompt. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 84
+  },
+  {
+    "id": "S087",
+    "name": "task_ordering",
+    "meaning": "Preserve task ordering and dependencies.",
+    "compact": "task-ordering",
+    "expansion": "Preserve task ordering and dependencies. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 83
+  },
+  {
+    "id": "S088",
+    "name": "fallback_plan",
+    "meaning": "Include fallback handling for blocked execution.",
+    "compact": "fallback-plan",
+    "expansion": "Include fallback handling for blocked execution. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 82
+  },
+  {
+    "id": "S089",
+    "name": "verification_reminder",
+    "meaning": "Require post-run verification and report checks.",
+    "compact": "verification-reminder",
+    "expansion": "Require post-run verification and report checks. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 81
+  },
+  {
+    "id": "S090",
+    "name": "scope_guard",
+    "meaning": "Reiterate project boundary and scope guardrails.",
+    "compact": "scope-guard",
+    "expansion": "Reiterate project boundary and scope guardrails. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "reconstruction",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 90
+  },
+  {
+    "id": "S091",
+    "name": "context_loss_report",
+    "meaning": "Generate context loss verification report.",
+    "compact": "context-loss-report",
+    "expansion": "Generate context loss verification report. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 84
+  },
+  {
+    "id": "S092",
+    "name": "critical_constraint_detection",
+    "meaning": "Detect missing critical constraints.",
+    "compact": "critical-constraint-detection",
+    "expansion": "Detect missing critical constraints. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 83
+  },
+  {
+    "id": "S093",
+    "name": "reduction_estimate",
+    "meaning": "Estimate compression and reduction metrics.",
+    "compact": "reduction-estimate",
+    "expansion": "Estimate compression and reduction metrics. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 82
+  },
+  {
+    "id": "S094",
+    "name": "semantic_preservation_score",
+    "meaning": "Score semantic preservation from 0-100.",
+    "compact": "semantic-preservation-score",
+    "expansion": "Score semantic preservation from 0-100. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 81
+  },
+  {
+    "id": "S095",
+    "name": "demo_verification",
+    "meaning": "Validate demo pipeline outputs.",
+    "compact": "demo-verification",
+    "expansion": "Validate demo pipeline outputs. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 80
+  },
+  {
+    "id": "S096",
+    "name": "unit_test_execution",
+    "meaning": "Run unit tests and report status.",
+    "compact": "unit-test-execution",
+    "expansion": "Run unit tests and report status. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 79
+  },
+  {
+    "id": "S097",
+    "name": "artifact_presence_check",
+    "meaning": "Check required artifact presence.",
+    "compact": "artifact-presence-check",
+    "expansion": "Check required artifact presence. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 78
+  },
+  {
+    "id": "S098",
+    "name": "strict_failure_mode",
+    "meaning": "Fail fast when strict mode finds critical losses.",
+    "compact": "strict-failure-mode",
+    "expansion": "Fail fast when strict mode finds critical losses. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 77
+  },
+  {
+    "id": "S099",
+    "name": "regression_guard",
+    "meaning": "Protect against behavior regressions via tests.",
+    "compact": "regression-guard",
+    "expansion": "Protect against behavior regressions via tests. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 76
+  },
+  {
+    "id": "S100",
+    "name": "completion_gate",
+    "meaning": "Use completion gate before declaring success.",
+    "compact": "completion-gate",
+    "expansion": "Use completion gate before declaring success. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 85
+  },
+  {
+    "id": "S101",
+    "name": "real_tokenizer_support",
+    "meaning": "Future support for exact tokenizer metrics.",
+    "compact": "real-tokenizer-support",
+    "expansion": "Future support for exact tokenizer metrics. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 79
+  },
+  {
+    "id": "S102",
+    "name": "gui_extension",
+    "meaning": "Future local GUI interface.",
+    "compact": "gui-extension",
+    "expansion": "Future local GUI interface. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 78
+  },
+  {
+    "id": "S103",
+    "name": "hermes_integration",
+    "meaning": "Future deeper Hermes workflow integration.",
+    "compact": "hermes-integration",
+    "expansion": "Future deeper Hermes workflow integration. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 77
+  },
+  {
+    "id": "S104",
+    "name": "codex_integration",
+    "meaning": "Future Codex flow integration presets.",
+    "compact": "codex-integration",
+    "expansion": "Future Codex flow integration presets. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 76
+  },
+  {
+    "id": "S105",
+    "name": "personal_seed_learning",
+    "meaning": "Future personalized semantic seed learning.",
+    "compact": "personal-seed-learning",
+    "expansion": "Future personalized semantic seed learning. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 75
+  },
+  {
+    "id": "S106",
+    "name": "benchmark_suite",
+    "meaning": "Future benchmark suite for compiler quality.",
+    "compact": "benchmark-suite",
+    "expansion": "Future benchmark suite for compiler quality. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 74
+  },
+  {
+    "id": "S107",
+    "name": "semantic_graph_engine",
+    "meaning": "Future semantic graph reasoning engine.",
+    "compact": "semantic-graph-engine",
+    "expansion": "Future semantic graph reasoning engine. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 73
+  },
+  {
+    "id": "S108",
+    "name": "plugin_architecture",
+    "meaning": "Future plugin architecture for adapters.",
+    "compact": "plugin-architecture",
+    "expansion": "Future plugin architecture for adapters. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 72
+  },
+  {
+    "id": "S109",
+    "name": "local_llm_assist",
+    "meaning": "Future optional local LLM-assisted extraction.",
+    "compact": "local-llm-assist",
+    "expansion": "Future optional local LLM-assisted extraction. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 71
+  },
+  {
+    "id": "S110",
+    "name": "release_packaging",
+    "meaning": "Future packaging and release automation.",
+    "compact": "release-packaging",
+    "expansion": "Future packaging and release automation. Ejecuta este criterio de forma explícita y verificable.",
+    "categories": [
+      "future",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 80
+  },
+  {
+    "id": "S201",
+    "name": "spanish_english_bilingual_extraction",
+    "meaning": "Handle Spanish and English prompts in one extraction flow.",
+    "compact": "spanish-english-bilingual-extraction",
+    "expansion": "Handle Spanish and English prompts in one extraction flow. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "intent",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 88
+  },
+  {
+    "id": "S202",
+    "name": "constraint_lock_retention",
+    "meaning": "Lock critical constraints across all output layers.",
+    "compact": "constraint-lock-retention",
+    "expansion": "Lock critical constraints across all output layers. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "safety",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 96
+  },
+  {
+    "id": "S203",
+    "name": "nsl_deterministic_order",
+    "meaning": "Emit NSL fields in deterministic canonical order.",
+    "compact": "nsl-deterministic-order",
+    "expansion": "Emit NSL fields in deterministic canonical order. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "compression",
+      "software"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 84
+  },
+  {
+    "id": "S204",
+    "name": "report_honest_failures",
+    "meaning": "Never fake success; report failures with repair actions.",
+    "compact": "report-honest-failures",
+    "expansion": "Never fake success; report failures with repair actions. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "verification",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 91
+  },
+  {
+    "id": "S205",
+    "name": "model_profile_driven_level",
+    "meaning": "Choose best default compression level from target profile.",
+    "compact": "model-profile-driven-level",
+    "expansion": "Choose best default compression level from target profile. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "model",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 83
+  },
+  {
+    "id": "S206",
+    "name": "critical_phrase_tracking",
+    "meaning": "Track critical fragments from original prompt for preservation.",
+    "compact": "critical-phrase-tracking",
+    "expansion": "Track critical fragments from original prompt for preservation. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "verification",
+      "intent"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 90
+  },
+  {
+    "id": "S207",
+    "name": "anti_symbolic_garbage",
+    "meaning": "Avoid unreadable symbolic compression artifacts.",
+    "compact": "anti-symbolic-garbage",
+    "expansion": "Avoid unreadable symbolic compression artifacts. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "compression",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 86
+  },
+  {
+    "id": "S208",
+    "name": "offline_local_enforcement",
+    "meaning": "Enforce local-only execution assumptions.",
+    "compact": "offline-local-enforcement",
+    "expansion": "Enforce local-only execution assumptions. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "safety",
+      "software"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 95
+  },
+  {
+    "id": "S209",
+    "name": "testable_cli_contract",
+    "meaning": "CLI behavior must be testable and deterministic.",
+    "compact": "testable-cli-contract",
+    "expansion": "CLI behavior must be testable and deterministic. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "software",
+      "verification"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 87
+  },
+  {
+    "id": "S210",
+    "name": "artifact_schema_stability",
+    "meaning": "Maintain stable artifact schemas for automation.",
+    "compact": "artifact-schema-stability",
+    "expansion": "Maintain stable artifact schemas for automation. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "output",
+      "software"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 82
+  },
+  {
+    "id": "S211",
+    "name": "human_readable_balanced_nsl",
+    "meaning": "Balanced NSL must stay compact and readable.",
+    "compact": "human-readable-balanced-nsl",
+    "expansion": "Balanced NSL must stay compact and readable. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "compression",
+      "quality"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 85
+  },
+  {
+    "id": "S212",
+    "name": "strict_mode_gate",
+    "meaning": "Strict mode fails on critical semantic losses.",
+    "compact": "strict-mode-gate",
+    "expansion": "Strict mode fails on critical semantic losses. Mantén trazabilidad completa en los reportes.",
+    "categories": [
+      "verification",
+      "safety"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "generic"
+    ],
+    "priority": 93
+  },
+  {
+    "id": "S213",
+    "name": "user_intent_boundary",
+    "meaning": "Separate user-requested work from compiler-internal processing.",
+    "compact": "user_intent_boundary",
+    "expansion": "Separate user-requested work from compiler-internal processing. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "semantic",
+      "fidelity"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S214",
+    "name": "compiler_trace_audit",
+    "meaning": "Track internal pipeline steps as audit data, not user tasks.",
+    "compact": "compiler_trace_audit",
+    "expansion": "Track internal pipeline steps as audit data, not user tasks. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "audit",
+      "traceability"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S215",
+    "name": "policy_constraint_origin",
+    "meaning": "Mark product safety policy separately from user explicit constraints.",
+    "compact": "policy_constraint_origin",
+    "expansion": "Mark product safety policy separately from user explicit constraints. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "policy",
+      "traceability"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S216",
+    "name": "adapter_constraint_origin",
+    "meaning": "Mark target model adapter constraints separately from user constraints.",
+    "compact": "adapter_constraint_origin",
+    "expansion": "Mark target model adapter constraints separately from user constraints. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "adapter",
+      "traceability"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S217",
+    "name": "hash_only_privacy",
+    "meaning": "Persist only SHA-256 and omit raw prompt from serialized artifacts.",
+    "compact": "hash_only_privacy",
+    "expansion": "Persist only SHA-256 and omit raw prompt from serialized artifacts. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "privacy",
+      "safety"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S218",
+    "name": "redacted_preview_privacy",
+    "meaning": "Use short redacted previews when full original retention is not allowed.",
+    "compact": "redacted_preview_privacy",
+    "expansion": "Use short redacted previews when full original retention is not allowed. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "privacy",
+      "safety"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S219",
+    "name": "unsupported_addition_detection",
+    "meaning": "Detect claims or tasks added without source support.",
+    "compact": "unsupported_addition_detection",
+    "expansion": "Detect claims or tasks added without source support. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "verification",
+      "fidelity"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S220",
+    "name": "bidirectional_semantic_check",
+    "meaning": "Verify original-to-output retention and output-to-origin precision.",
+    "compact": "bidirectional_semantic_check",
+    "expansion": "Verify original-to-output retention and output-to-origin precision. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "verification",
+      "semantic"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S221",
+    "name": "contradiction_scan",
+    "meaning": "Scan generated instructions for contradictions against constraints.",
+    "compact": "contradiction_scan",
+    "expansion": "Scan generated instructions for contradictions against constraints. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "verification",
+      "safety"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S222",
+    "name": "constraint_traceability",
+    "meaning": "Require every effective constraint to expose its origin.",
+    "compact": "constraint_traceability",
+    "expansion": "Require every effective constraint to expose its origin. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "traceability",
+      "safety"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S223",
+    "name": "compact_nsl_contract",
+    "meaning": "Keep NSL compact and separate from expanded execution prompts.",
+    "compact": "compact_nsl_contract",
+    "expansion": "Keep NSL compact and separate from expanded execution prompts. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "compression",
+      "nsl"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S224",
+    "name": "execution_prompt_contract",
+    "meaning": "Render model-ready execution prompts without calling them compression artifacts.",
+    "compact": "execution_prompt_contract",
+    "expansion": "Render model-ready execution prompts without calling them compression artifacts. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "prompt",
+      "adapter"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S225",
+    "name": "audit_bundle_contract",
+    "meaning": "Bundle detailed provenance, metrics and warnings separately from execution prompt.",
+    "compact": "audit_bundle_contract",
+    "expansion": "Bundle detailed provenance, metrics and warnings separately from execution prompt. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "audit",
+      "reporting"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S226",
+    "name": "fast_no_inflation",
+    "meaning": "FAST profile should avoid expansion on simple direct tasks.",
+    "compact": "fast_no_inflation",
+    "expansion": "FAST profile should avoid expansion on simple direct tasks. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "compression",
+      "profile"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S227",
+    "name": "rop_deliberate_expansion",
+    "meaning": "ROP expansion must be explicit, justified and scenario-driven.",
+    "compact": "rop_deliberate_expansion",
+    "expansion": "ROP expansion must be explicit, justified and scenario-driven. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "profile",
+      "strategy"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S228",
+    "name": "research_max_deliberate_expansion",
+    "meaning": "RESEARCH_MAX expansion must preserve nuance and document why.",
+    "compact": "research_max_deliberate_expansion",
+    "expansion": "RESEARCH_MAX expansion must preserve nuance and document why. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "profile",
+      "research"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S229",
+    "name": "strict_shared_policy",
+    "meaning": "Load strict thresholds from shared config for CLI, service and GUI.",
+    "compact": "strict_shared_policy",
+    "expansion": "Load strict thresholds from shared config for CLI, service and GUI. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "policy",
+      "verification"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S230",
+    "name": "strict_blocked_state",
+    "meaning": "Do not present strict-failed output as approved.",
+    "compact": "strict_blocked_state",
+    "expansion": "Do not present strict-failed output as approved. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "gui",
+      "verification"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S231",
+    "name": "qt_worker_cancel_token",
+    "meaning": "Use a real Qt worker and cancellation token between processing stages.",
+    "compact": "qt_worker_cancel_token",
+    "expansion": "Use a real Qt worker and cancellation token between processing stages. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "gui",
+      "qt"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S232",
+    "name": "qt_status_state_machine",
+    "meaning": "Expose prepared, processing, cancel requested, canceled, blocked, completed and error states.",
+    "compact": "qt_status_state_machine",
+    "expansion": "Expose prepared, processing, cancel requested, canceled, blocked, completed and error states. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "gui",
+      "accessibility"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S233",
+    "name": "custom_model_visible_name",
+    "meaning": "Expose a real custom model name when target profile is custom.",
+    "compact": "custom_model_visible_name",
+    "expansion": "Expose a real custom model name when target profile is custom. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "adapter",
+      "gui"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S234",
+    "name": "wheel_resource_resolution",
+    "meaning": "Resolve configs and assets from package resources after wheel installation.",
+    "compact": "wheel_resource_resolution",
+    "expansion": "Resolve configs and assets from package resources after wheel installation. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "packaging",
+      "python"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S235",
+    "name": "clean_release_staging",
+    "meaning": "Build release archives from a clean staging tree.",
+    "compact": "clean_release_staging",
+    "expansion": "Build release archives from a clean staging tree. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "packaging",
+      "release"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S236",
+    "name": "tarball_self_exclusion",
+    "meaning": "Ensure release tarballs cannot contain dist outputs or themselves.",
+    "compact": "tarball_self_exclusion",
+    "expansion": "Ensure release tarballs cannot contain dist outputs or themselves. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "packaging",
+      "release"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S237",
+    "name": "pytest_collection_boundaries",
+    "meaning": "Configure pytest to ignore backups, outputs, dist and caches.",
+    "compact": "pytest_collection_boundaries",
+    "expansion": "Configure pytest to ignore backups, outputs, dist and caches. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "testing",
+      "qa"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S238",
+    "name": "visual_qa_offscreen_capture",
+    "meaning": "Capture reproducible GUI screenshots in offscreen mode when possible.",
+    "compact": "visual_qa_offscreen_capture",
+    "expansion": "Capture reproducible GUI screenshots in offscreen mode when possible. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "gui",
+      "qa"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S239",
+    "name": "desktop_exec_path_command",
+    "meaning": "Use PATH command npsc-gui in installed desktop files.",
+    "compact": "desktop_exec_path_command",
+    "expansion": "Use PATH command npsc-gui in installed desktop files. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "linux",
+      "packaging"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S240",
+    "name": "appstream_metadata_coherence",
+    "meaning": "Keep AppStream metadata aligned with installed executable and icon.",
+    "compact": "appstream_metadata_coherence",
+    "expansion": "Keep AppStream metadata aligned with installed executable and icon. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "linux",
+      "packaging"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S241",
+    "name": "debian_truthful_status",
+    "meaning": "Report Debian packaging as prepared or built only according to actual validation.",
+    "compact": "debian_truthful_status",
+    "expansion": "Report Debian packaging as prepared or built only according to actual validation. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "debian",
+      "release"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S242",
+    "name": "target_adapter_specificity",
+    "meaning": "Prefer target-specific output guidance over generic adapter text.",
+    "compact": "target_adapter_specificity",
+    "expansion": "Prefer target-specific output guidance over generic adapter text. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "adapter",
+      "prompt"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S243",
+    "name": "sensitive_text_leak_check",
+    "meaning": "Search serialized artifacts to ensure sensitive text is absent in hash_only mode.",
+    "compact": "sensitive_text_leak_check",
+    "expansion": "Search serialized artifacts to ensure sensitive text is absent in hash_only mode. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "privacy",
+      "qa"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S244",
+    "name": "golden_case_orthography",
+    "meaning": "Golden case for short orthography correction without internal contamination.",
+    "compact": "golden_case_orthography",
+    "expansion": "Golden case for short orthography correction without internal contamination. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "testing",
+      "golden"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S245",
+    "name": "golden_case_translation",
+    "meaning": "Golden case for short translation with compact output.",
+    "compact": "golden_case_translation",
+    "expansion": "Golden case for short translation with compact output. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "testing",
+      "golden"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S246",
+    "name": "golden_case_strategy",
+    "meaning": "Golden case for strategy prompts selecting ROP appropriately.",
+    "compact": "golden_case_strategy",
+    "expansion": "Golden case for strategy prompts selecting ROP appropriately. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "testing",
+      "golden"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S247",
+    "name": "golden_case_research",
+    "meaning": "Golden case for deep research selecting RESEARCH_MAX appropriately.",
+    "compact": "golden_case_research",
+    "expansion": "Golden case for deep research selecting RESEARCH_MAX appropriately. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "testing",
+      "golden"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  },
+  {
+    "id": "S248",
+    "name": "path_with_spaces_safety",
+    "meaning": "Handle file paths containing spaces without command breakage.",
+    "compact": "path_with_spaces_safety",
+    "expansion": "Handle file paths containing spaces without command breakage. Ejecuta este criterio solo cuando sea relevante y trazable.",
+    "categories": [
+      "testing",
+      "safety"
+    ],
+    "target_models": [
+      "gpt",
+      "codex",
+      "hermes",
+      "claude",
+      "gemini",
+      "qwen",
+      "deepseek",
+      "llama",
+      "mistral",
+      "generic",
+      "custom",
+      "gpt55_codex"
+    ],
+    "priority": 70
+  }
+]

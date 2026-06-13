@@ -1,0 +1,1 @@
+Build a local Ubuntu application that compiles messy prompts into semantic instructions. Keep backups, produce tests, avoid sudo, avoid external APIs, generate execution reports, and keep UI quality high. Stay inside project root and avoid destructive commands.

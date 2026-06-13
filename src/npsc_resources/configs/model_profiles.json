@@ -1,0 +1,119 @@
+{
+  "auto": {
+    "preferred_structure": "auto_target_detection",
+    "compression_tolerance": "medium",
+    "best_level": "balanced",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "auto_resolved_safe_default",
+    "notes": "Automatic target selector. The service resolves this to the prompt-detected target when reliable, otherwise codex."
+  },
+  "gpt": {
+    "preferred_structure": "hierarchical_clear",
+    "compression_tolerance": "medium",
+    "best_level": "balanced",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "sections_with_acceptance_criteria",
+    "notes": "Good with compact structured instructions and explicit outputs."
+  },
+  "codex": {
+    "preferred_structure": "operational_file_oriented",
+    "compression_tolerance": "medium",
+    "best_level": "balanced",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "files_commands_tests_verification",
+    "notes": "Prefer concrete files, commands, and verification constraints."
+  },
+  "hermes": {
+    "preferred_structure": "phase_based_safe_execution",
+    "compression_tolerance": "low",
+    "best_level": "safe",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "phases_reports_fallbacks",
+    "notes": "Strong boundary and non-destructive constraints required."
+  },
+  "claude": {
+    "preferred_structure": "structured_reasoned",
+    "compression_tolerance": "medium",
+    "best_level": "balanced",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "structured_reasoning_plus_deliverables",
+    "notes": "Works well with clean sectioned constraints."
+  },
+  "gemini": {
+    "preferred_structure": "explicit_sections",
+    "compression_tolerance": "medium",
+    "best_level": "balanced",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "clear_task_blocks",
+    "notes": "Benefits from explicit context and output blocks."
+  },
+  "qwen": {
+    "preferred_structure": "explicit_stepwise",
+    "compression_tolerance": "low",
+    "best_level": "safe",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "stepwise_actions_and_checks",
+    "notes": "Lower ambiguity works better than dense abstraction."
+  },
+  "deepseek": {
+    "preferred_structure": "task_constraint_first",
+    "compression_tolerance": "medium",
+    "best_level": "balanced",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "tasks_plus_constraints_plus_checks",
+    "notes": "Good at structured tasks with explicit limits."
+  },
+  "llama": {
+    "preferred_structure": "plain_explicit",
+    "compression_tolerance": "low",
+    "best_level": "safe",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "simple_clear_instructions",
+    "notes": "Local models usually need lower abstraction density."
+  },
+  "mistral": {
+    "preferred_structure": "compact_explicit",
+    "compression_tolerance": "low",
+    "best_level": "safe",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "compact_steps_and_expected_outputs",
+    "notes": "Reliable with compact but clear constraints."
+  },
+  "custom": {
+    "preferred_structure": "custom_safe_default",
+    "compression_tolerance": "medium",
+    "best_level": "balanced",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "custom_model_constraints_tasks_outputs",
+    "notes": "Manual target override for models not yet listed. No special capabilities are assumed."
+  },
+  "gpt55_codex": {
+    "preferred_structure": "high_reasoning_operational_file_oriented",
+    "compression_tolerance": "medium",
+    "best_level": "balanced",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "files_commands_tests_verification_and_final_report",
+    "notes": "Imported from GUI concepts as a high-reasoning Codex-style model profile. This is a local prompt-shaping profile, not a claim about external model availability."
+  },
+  "generic": {
+    "preferred_structure": "safe_default",
+    "compression_tolerance": "low",
+    "best_level": "safe",
+    "needs_explicit_safety": true,
+    "needs_operational_steps": true,
+    "recommended_output_contract": "constraints_tasks_outputs",
+    "notes": "Fallback profile for unknown models."
+  }
+}

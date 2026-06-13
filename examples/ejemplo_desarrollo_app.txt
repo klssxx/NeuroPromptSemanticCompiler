@@ -1,0 +1,39 @@
+# Ejemplo 1: Desarrollo de aplicación
+
+## Petición informal
+"Necesito crear una app de tareas en Python con interfaz gráfica"
+
+## Resultado estructurado
+
+**Contexto y rol:**
+Eres un desarrollador Python senior especializado en aplicaciones de escritorio con PySide6/Qt.
+
+**Consulta o tarea:**
+Crear una aplicación de gestión de tareas (todo list) en Python con interfaz gráfica.
+
+**Especificaciones:**
+- Lenguaje: Python 3.10+
+- Framework GUI: PySide6 (Qt for Python)
+- Persistencia: SQLite local
+- Funcionalidades: crear, editar, eliminar, marcar como completadas, filtrar por estado
+- Arquitectura: separación modelo/vista/controlador
+
+**Criteridad de calidad:**
+- Código limpio con type hints
+- Manejo de errores apropiado
+- Interfaz responsive y accesible
+- Tests unitarios para la lógica de negocio
+
+**Formato de salida:**
+1. Estructura de archivos del proyecto
+2. Implementación completa de cada módulo
+3. Instrucciones de ejecución
+
+**Verificación:**
+- La app debe iniciar sin errores
+- Las operaciones CRUD deben funcionar
+- Los datos deben persistir entre sesiones
+
+---
+Perfil: ADVANCED
+Modelo: codex

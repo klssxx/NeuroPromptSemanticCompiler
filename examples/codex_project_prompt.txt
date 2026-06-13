@@ -1,0 +1,1 @@
+Act as codex engineer. Create a Python CLI project that compiles prompts into a compact structured language, generates tests, and verifies context loss. Do not use sudo, do not use external APIs, and keep all operations inside the provided root folder.

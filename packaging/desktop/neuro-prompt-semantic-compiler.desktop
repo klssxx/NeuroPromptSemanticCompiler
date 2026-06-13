@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Name=NeuroPrompt Semantic Compiler
+Name[es]=NeuroPrompt Semantic Compiler
+GenericName=Semantic Prompt Compiler
+GenericName[es]=Compilador semántico de prompts
+Comment=Compile human prompts into NSL and hybrid AI-ready semantic outputs
+Comment[es]=Compila prompts humanos a NSL y salidas semánticas híbridas listas para IA
+Exec=npsc-gui
+Icon=neuro-prompt-semantic-compiler
+Terminal=false
+Categories=Development;TextTools;
+Keywords=prompt;AI;semantic;compiler;NSL;
+Keywords[es]=prompt;IA;semántica;compilador;NSL;
+StartupNotify=true
+StartupWMClass=NeuroPrompt Semantic Compiler

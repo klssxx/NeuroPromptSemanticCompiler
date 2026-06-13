@@ -1,0 +1,1 @@
+Necesito investigar semantic compression y transformación de prompts con referencias y método de evaluación. El proyecto local no debe usar APIs externas, debe incluir reportes, y debe preservar restricciones críticas de seguridad.

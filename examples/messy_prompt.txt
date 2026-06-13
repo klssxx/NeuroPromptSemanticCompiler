@@ -1,0 +1,1 @@
+Quiero que me hagas una app local para mejorar prompts, pero no una tontería de resumir, quiero que detecte intención, roles, contexto, restricciones, lo convierta a algo compacto tipo R/G/CTX/T/C/P/OUT, que no pierda seguridad, que sirva para Codex, Hermes y GPT, que genere reportes y tests, sin sudo, sin APIs, en Ubuntu, sin tocar fuera del proyecto y nada destructivo.

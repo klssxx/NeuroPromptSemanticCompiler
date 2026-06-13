@@ -1,0 +1,43 @@
+# Ejemplo 2: Auditoría de código con variables
+
+## Petición informal
+"Revisa el código de {{nombre_proyecto}} en busca de problemas de seguridad"
+
+## Variables rellenables
+- nombre_proyecto: mi-api-web
+- lenguaje: Python/FastAPI
+- framework: FastAPI + SQLAlchemy
+
+## Resultado estructurado
+
+**Contexto y rol:**
+Eres un auditor de seguridad especializado en aplicaciones web {{lenguaje}}.
+
+**Consulta o tarea:**
+Realiza una auditoría de seguridad exhaustiva del proyecto {{nombre_proyecto}}.
+
+**Especificaciones:**
+- Revisar: inyección SQL, XSS, CSRF, autenticación, autorización, gestión de secretos
+- Formato de hallazgra: ubicación del archivo, línea, severidad, descripción, remediación
+- Priorizar: crítico > alto > medio > bajo
+- Incluir: checklist OWASP Top 10
+
+**Criterios de calidad:**
+- Cada hallazgo debe incluir código vulnerable y código corregido
+- Referencias a documentación oficial
+- Remediaciones específicas y aplicables
+
+**Formato de salida:**
+1. Ejecutivo resumen
+2. Tabla de hallazgos por severidad
+3. Detalle completo por archivo
+4. Plan de remediación priorizado
+
+**Verificación:**
+- Todos los hallazgos deben ser reproducibles
+- Las remediaciones deben ser testables
+
+---
+Perfil: ADVANCED
+Modelo: hermes
+Variables: {{nombre_proyecto}}, {{lenguaje}}, {{framework}}

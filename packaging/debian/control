@@ -1,0 +1,14 @@
+Source: neuro-prompt-semantic-compiler
+Section: utils
+Priority: optional
+Maintainer: NeuroPrompt Team <maintainers@example.invalid>
+Build-Depends: debhelper-compat (= 13), python3, python3-setuptools
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: neuro-prompt-semantic-compiler
+Architecture: all
+Depends: ${python3:Depends}, ${misc:Depends}, python3-pyside6
+Description: Semantic prompt compiler for AI workflows
+ Offline desktop and CLI application that compiles human prompts into
+ NSL, hybrid Markdown, machine-readable JSON and validation reports.
