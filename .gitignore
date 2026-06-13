@@ -12,27 +12,47 @@ build/
 .venv/
 venv/
 
-# IDE
-.vscode/
-.idea/
+# Caches and test artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
-# Project outputs
+# Logs and archives
+*.log
+*.zip
+*.tar.gz
+*.tgz
+*.7z
+
+# Environment / secrets
+.env
+.env.*
+secrets.*
+
+# Project outputs (runtime artifacts)
 outputs/
 staging/
 artifacts/
 _backups/
 backups/
+artifacts-*/
+app-tkinter-legacy/
 
-# OS
-.DirectoryEntry
-.DirecyoryEntry
+# IDE / editor
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+*~
 
-# Test/coverage
-.pytest_cache/
-.coverage
-htmlcov/
+# KDE / desktop
+.DirectoryEntry
+.Directory
+.directory
 
-# Release
-*.tar.gz
+# Local screenshots not meant for repo
+screenshots/local/

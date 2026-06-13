@@ -1,34 +1,48 @@
-# CHANGELOG.md — NeuroPrompt Semantic Compiler
+# CHANGELOG — NeuroPrompt Semantic Compiler
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [1.0.0] — 2026-06-13
 
-### Añadido
-- **Sistema de variables `{{nombre}}`**: Detección automática, formulario de rellenado, sustitución segura antes de compilar
-- **Página de plantillas reutilizables**: CRUD completo (crear, editar, duplicar, eliminar, importar, exportar) con categorías
-- **Historial de versiones persistente**: Cada compilación se guarda automáticamente; comparación visual con diff unificado
-- **Exportación mejorada**: Markdown (documento estructurado), JSON (esquema estable `neuroprompt/compilation-result/v1`), TXT (solo prompt)
-- **Validador de campos**: Detecta variables sin rellenar, prompts vacíos, campos muy cortos; distingue errores de advertencias
-- **Guardado/carga de proyectos**: Formato `.npsc.json` con esquema versionado
-- **Diálogo de variables**: Ctrl+Shift+V para rellenar variables detectadas
-- **Atajos de teclado**: Ctrl+G (guardar proyecto), Ctrl+Shift+O (cargar proyecto), Ctrl+Shift+V (variables)
-- **50 tests nuevos**: variables, template_manager, version_history, export_manager, field_validator
-- **Scripts**: `run.sh`, `smoke_test.sh`, `setup_venv_instructions.sh`
-- **Web demo estática**: Demo visual del flujo de transformación (HTML/CSS/JS)
-- **Documentación profesional**: README.md, README.es.md, AUDIT_FEATURE_MATRIX.md, IMPLEMENTATION_PLAN.md
+First public, portfolio-ready release of NeuroPrompt Semantic Compiler.
 
-### Mejorado
-- **GUI**: 9 páginas en modo avanzado (añadidas Plantillas e Historial)
-- **Validación pre-compilación**: El prompt se valida antes de enviar al worker
-- **Auto-guardado en historial**: Cada compilación exitosa se guarda automáticamente
-- **Mensajes de error**: Más comprensibles en español
-- **i18n**: ~80 nuevas traducciones (templates, history, validation)
+### Added
+
+- **Variables system `{{name}}`** — auto-detection, fill dialog (`Ctrl+Shift+V`), safe substitution before compilation.
+- **Reusable templates page** — full CRUD (create, edit, duplicate, delete, import, export) with categories, tags and search.
+- **Persistent version history** — every successful compilation is auto-saved; visual diff between any two versions.
+- **Triple export** — Markdown (structured document), JSON (stable schema `neuroprompt/compilation-result/v1`), TXT (prompt only).
+- **Field validator** — detects empty fields, unfilled variables, very short prompts; distinguishes errors from warnings.
+- **Project save / load** — `.npsc.json` format with a versioned schema.
+- **Simple and advanced modes** — advanced mode exposes 6 editable sections (context/role, query/task, specifications, quality criteria, output format, verification) that can be saved/loaded as `.nsect.json`.
+- **About dialog** — version, license, privacy notes, limitations, GitHub link.
+- **Export preview dialog** — Markdown, JSON, and text tabs with copy-to-clipboard and export-to-file.
+- **Keyboard shortcuts** — `Ctrl+Enter` (compile), `Ctrl+Shift+C` (copy), `Ctrl+N/L` (new), `Ctrl+O` (open), `Ctrl+S` (save), `Ctrl+G` (save project), `Ctrl+Shift+O` (load project), `Ctrl+Shift+V` (variables), `Ctrl+M` (toggle mode), `F1` (help).
+- **Static web demo** — see [`web-demo/`](web-demo/) for a no-install preview of the core flow.
+- **Bilingual UI** — Spanish and English; launcher key labels and CLI fully translated.
+- **Scripts** — `scripts/run.sh`, `scripts/smoke_test.sh`, `scripts/setup_venv_instructions.sh`.
+- **Documentation** — `README.md` and `README.es.md`, `docs/FINAL_PATH_AUDIT.md`, `docs/PUBLICATION_PRIVACY_AUDIT.md`.
+
+### Improved
+
+- **GUI** — nine pages in advanced mode (including Templates and History).
+- **Pre-compile validation** — the form is validated before sending the request to the compilation worker.
+- **Error messages** — friendlier Spanish copy across the application.
+- **i18n** — ~80 new translation keys for templates, history, validation, advanced mode and about dialog.
+- **Theme** — optimised for KDE Plasma on X11; light and dark variants.
 
 ### Tests
-- **93 tests pasando** (43 originales + 50 nuevos)
-- 0 errores de sintaxis en todos los archivos Python
 
-### Técnico
-- Python 3.12.13 + PySide6 6.11.1
-- Compatible con KDE Plasma X11
-- Sin dependencias externas más allá de PySide6
-- 100% local, sin telemetría
+- **103 tests passing** (non-GUI pytest suite).
+- **0 syntax errors** across all `src/` Python files.
+- GUI widget tests documented as `MANUAL_REVIEW_REQUIRED` (require `pytest-qt` and a real display).
+
+### Technical
+
+- Python 3.10+ and PySide6 6.11+.
+- Compatible with KDE Plasma on X11; works on legacy NVIDIA Kepler GPUs.
+- No third-party dependencies beyond PySide6 and `tiktoken` (optional, for token estimation).
+- 100% local, no telemetry, no API keys, no internet access.

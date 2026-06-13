@@ -1,152 +1,246 @@
-🌐 **Language:** [English](README.md) · [Español](README.es.md)
+🌐 **Idioma:** [English](README.md) · [Español](README.es.md)
 
 # NeuroPrompt Semantic Compiler
 
-NeuroPrompt Semantic Compiler convierte prompts humanos desordenados en instrucciones compactas, estructuradas y legibles por modelo usando NSL v0.1 y NPSC-HYBRID/1.0.
+> Herramienta de escritorio que transforma solicitudes informales para IA en especificaciones estructuradas, reutilizables, versionadas y exportables.
 
-No es un resumidor ciego. Es un compilador semántico de intención: preserva objetivos, restricciones, riesgos, contexto del modelo destino y metadatos de verificación mientras hace que los prompts sean más fáciles de usar con sistemas de IA.
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
+[![PySide6 6.11+](https://img.shields.io/badge/PySide6-6.11+-green.svg)](https://www.qt.io/qt-for-python)
+[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-103%20passed-brightgreen.svg)](#validación)
 
-## Frase central
+**NeuroPrompt Semantic Compiler (NPSC)** es una aplicación de escritorio ligera y **100% local** que convierte prompts desordenados en instrucciones claras, estructuradas, versionadas y exportables. Funciona sin conexión, sin telemetría y sin claves API.
 
-Not fewer words by losing meaning; more power per token by transmitting structured intention.
+---
 
-## Funciones
+## El problema
 
-- GUI de escritorio PySide6 / Qt Widgets con modo sencillo y modo experto.
-- CLI para compilación reproducible de prompts.
-- Perfiles semánticos: `FAST`, `STANDARD`, `ADVANCED`, `ROP`, `RESEARCH_MAX`, `AUTO`.
-- Modelos destino: GPT, Codex, Claude, Gemini, Qwen, DeepSeek, Llama, Mistral, Hermes, generic y custom.
-- Modos de privacidad: `full_original`, `hash_only`, `redacted_preview`.
-- Base bilingüe: castellano e inglés en consola, etiquetas clave de GUI y metadatos del lanzador.
-- Local-first: sin telemetría, sin llamadas a APIs externas y sin ejecución remota.
+Escribir buenos prompts es difícil. La mayoría se redactan deprisa, mezclan varias intenciones, omiten restricciones y resultan imposibles de reutilizar, comparar o entregar a otra persona. NPSC resuelve esto con un proceso pequeño y opinado:
 
-## Inicio rápido desde código fuente
+```text
+Petición informal
+   → especificación estructurada
+   → validación de campos
+   → perfil de modelo
+   → prompt versionado y exportable
+```
+
+---
+
+## Funcionalidades
+
+- **Modo sencillo** — Escribe una petición breve y obtén un prompt estructurado con un solo clic.
+- **Modo avanzado** — Edita individualmente las seis secciones del prompt (contexto/rol, consulta/tarea, especificaciones, criterios de calidad, formato de salida, verificación) y guárdalas como archivos `.nsect.json`.
+- **Plantillas reutilizables** — Crea, edita, duplica, busca y etiqueta plantillas.
+- **Variables rellenables** — Usa marcadores `{{variable}}` y rellénalos antes de compilar.
+- **Historial de versiones** — Cada compilación se guarda localmente; compara dos versiones con un diff visual.
+- **Exportación triple** — Markdown, JSON (esquema estable) y texto plano.
+- **Perfiles de modelo** — `AUTO`, `FAST`, `STANDARD`, `ADVANCED`, `ROP`, `RESEARCH_MAX`; destinos Hermes, Codex, Claude, GPT, Gemini, Qwen, DeepSeek, Llama, Mistral, genérico.
+- **Validador de campos** — Detecta campos vacíos, variables sin rellenar y prompts demasiado cortos antes de compilar.
+- **Guardado de proyectos** — Persiste sesiones completas como JSON.
+- **Bilingüe** — Español e inglés.
+- **Tema oscuro/claro** — Optimizado para KDE Plasma sobre X11.
+- **Demo web estática** — Consulta [`web-demo/`](web-demo/) para una vista previa del flujo principal sin instalar nada.
+
+---
+
+## Instalación
+
+### Requisitos
+
+- Python 3.10 o superior
+- PySide6 6.11 o superior
+
+### Opción A — con `uv` (recomendado)
 
 ```bash
+git clone https://github.com/<tu-usuario>/NeuroPromptSemanticCompiler.git
+cd NeuroPromptSemanticCompiler
+uv venv .venv
+uv pip install -r requirements.txt
+./scripts/run.sh
+```
+
+### Opción B — con venv estándar
+
+```bash
+git clone https://github.com/<tu-usuario>/NeuroPromptSemanticCompiler.git
 cd NeuroPromptSemanticCompiler
 python3 -m venv .venv
-.venv/bin/python -m pip install -U pip
+.venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
-./run_gui.sh
+./scripts/run.sh
 ```
 
-Ejemplo CLI:
+---
 
-```bash
-PYTHONPATH=src .venv/bin/python -m npsc_cli \
-  --text "Crea una herramienta local. No uses sudo. Evita acciones destructivas." \
-  --out outputs/demo \
-  --target codex \
-  --profile auto \
-  --privacy-mode hash_only \
-  --language es
+## Uso
+
+1. Escribe tu petición informal en el editor principal.
+2. Elige un perfil (por defecto `AUTO`) y un modelo destino.
+3. Pulsa **COMPILAR PROMPT** (o `Ctrl+Enter`).
+4. Copia el resultado o expórtalo en Markdown, JSON o TXT.
+
+### Atajos de teclado
+
+| Atajo | Acción |
+|---|---|
+| `Ctrl+Enter` | Compilar prompt |
+| `Ctrl+Shift+C` | Copiar prompt compilado |
+| `Ctrl+N` / `Ctrl+L` | Nuevo prompt |
+| `Ctrl+O` | Abrir archivo de texto |
+| `Ctrl+S` | Guardar resultados |
+| `Ctrl+G` | Guardar proyecto |
+| `Ctrl+Shift+O` | Cargar proyecto |
+| `Ctrl+Shift+V` | Rellenar variables |
+| `Ctrl+M` | Alternar modo sencillo / avanzado |
+| `F1` | Abrir glosario / ayuda |
+
+### Demo web (sin instalación)
+
+Abre [`web-demo/index.html`](web-demo/index.html) en cualquier navegador o visita la URL de GitHub Pages del repositorio cuando esté habilitada.
+
+---
+
+## Estructura del proyecto
+
+```text
+NeuroPromptSemanticCompiler/
+├── src/
+│   ├── npsc_gui/              # Capa GUI con PySide6
+│   │   ├── main_window.py     # Ventana principal, modos, integración
+│   │   ├── advanced_mode_page.py
+│   │   ├── about_dialog.py
+│   │   ├── export_preview.py
+│   │   ├── integration.py
+│   │   ├── template_page.py
+│   │   ├── tooltips.py
+│   │   └── ...
+│   ├── variables.py           # Detección y relleno de {{variables}}
+│   ├── template_manager.py    # CRUD de plantillas
+│   ├── version_history.py     # Snapshots + diff visual
+│   ├── export_manager.py      # Exportadores Markdown / JSON / TXT
+│   ├── field_validator.py     # Validación del formulario
+│   ├── npsc_service.py        # Punto de entrada de la compilación
+│   ├── nsl_compiler.py        # Compilador NSL
+│   ├── semantic_extractor.py  # Extracción semántica ligera
+│   ├── token_estimator.py     # Conteo de tokens con tiktoken
+│   └── ...
+├── tests/                     # 103 tests pasando (pytest)
+├── examples/                  # Ejemplos de peticiones informales
+├── web-demo/                  # Demo HTML estática
+├── docs/                      # Documentación adicional
+├── scripts/
+│   ├── run.sh                 # Lanzar la aplicación
+│   ├── smoke_test.sh          # Verificación rápida
+│   └── setup_venv_instructions.sh
+├── requirements.txt
+├── pyproject.toml
+└── README.es.md
 ```
 
-Etiquetas CLI en inglés:
-
-```bash
-PYTHONPATH=src .venv/bin/python -m npsc_cli \
-  --text "Build a local tool. Do not use sudo." \
-  --out outputs/demo-en \
-  --target codex \
-  --profile auto \
-  --language en
-```
-
-## Compatibilidad Linux
-
-El proyecto está diseñado para funcionar en la mayoría de distribuciones Linux modernas con Python 3.10+ y PySide6/Qt 6:
-
-- Ubuntu, Xubuntu, Kubuntu, Debian y derivadas
-- Fedora y derivadas
-- Arch, CachyOS, Manjaro y derivadas
-- Otros escritorios compatibles con XDG y launchers Qt/GTK
-
-La GUI usa Qt Widgets nativos, no Electron, no web view y evita efectos pesados de GPU. Debería funcionar en GPUs antiguas siempre que el plugin Qt de plataforma funcione correctamente.
-
-Notas por distribución: [docs/LINUX_INSTALL.es.md](docs/LINUX_INSTALL.es.md)
-
-## Archivos de salida
-
-Cada ejecución exporta artefactos únicos:
-
-- `canonical_nsl.nsl`
-- `compiled_safe.nsl`
-- `compiled_balanced.nsl`
-- `compiled_aggressive.nsl`
-- `optimized_prompt.txt`
-- `reconstructed_prompt.txt`
-- `hybrid_semantic_prompt.md`
-- `hybrid_semantic_prompt.json`
-- `semantic_ir.json`
-- `semantic_analysis.json`
-- `semantic_seeds.json`
-- `profile_selection_report.json`
-- `profile_report.json`
-- `context_loss_report.md`
-- `context_loss_report.json`
-- `token_estimate_report.md`
-- `token_estimate_report.json`
-- `run_summary.md`
-
-Archivos principales:
-
-- `optimized_prompt.txt`: prompt listo para copiar a otro modelo o agente.
-- `canonical_nsl.nsl`: representación compacta canónica en NSL.
-- `hybrid_semantic_prompt.*`: bundle completo de trazabilidad.
-
-## Launcher e icono
-
-El icono del lanzador se entrega como SVG y como PNGs renderizados en `assets/icons/`.
-
-Metadatos de escritorio:
-
-- `NeuroPromptSemanticCompiler.desktop`
-- `packaging/desktop/neuro-prompt-semantic-compiler.desktop`
-
-Instalación local sin sudo:
-
-```bash
-bash tools/install_local_user.sh
-```
-
-Desinstalación:
-
-```bash
-bash tools/uninstall_local_user.sh
-```
+---
 
 ## Validación
 
 ```bash
-QT_QPA_PLATFORM=offscreen PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
-bash tools/check_runtime.sh
+# Suite de tests (no requiere display cuando se ejecuta headless)
+QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/ -q
+
+# O usando el smoke test incluido
+./scripts/smoke_test.sh
 ```
 
-Comprobaciones opcionales de proyecto/release:
+Estado actual: **103 tests pasando** (suite no-GUI). Los tests de widgets GUI se ejecutan manualmente con un display real.
 
-```bash
-bash tools/verify_project.sh
-bash tools/build_release.sh
+---
+
+## Formatos de exportación
+
+### Markdown
+
+Documento estructurado con secciones, metadatos, prompt compilado, NSL e informe de validación.
+
+### JSON
+
+```json
+{
+  "$schema": "neuroprompt/compilation-result/v1",
+  "generator": "NeuroPrompt Semantic Compiler",
+  "exported_at": "2026-06-13T...",
+  "result": { /* objeto de resultado estable y versionado */ }
+}
 ```
 
-## Empaquetado para GitHub/GitLab
+### TXT
 
-Antes de publicar, excluye carpetas generadas como `.venv/`, `staging/`, `_backups/`, `outputs/`, `artifacts/`, `dist/`, `build/`, `*.egg-info`, `__pycache__/` y `.pytest_cache/`.
+Solo el prompt compilado, listo para copiar y pegar.
 
-Puedes generar un archivo limpio con:
+---
 
-```bash
-bash tools/export_source_clean.sh
-```
+## Perfiles de modelo
 
-## Limitaciones
+| Perfil | Estilo | Uso recomendado |
+|---|---|---|
+| `AUTO` | Auto-detección | Dejar que la app elija |
+| `FAST` | Compacto | Tareas simples y rápidas |
+| `STANDARD` | Equilibrado | Uso general |
+| `ADVANCED` | Operativo, orientado a archivos | Programación, arquitectura |
+| `ROP` | Fases, escenarios, evidencias | Decisiones complejas |
+| `RESEARCH_MAX` | Máxima preservación | Investigación profunda |
 
-- La estimación de tokens es aproximada (`chars / 4`).
-- La extracción semántica es heurística, no basada en ML.
-- La cobertura completa de textos GUI aún no está traducida al 100%; launcher, settings clave y CLI ya tienen ruta bilingüe.
-- Antes de publicar una release final conviene hacer una revisión visual humana en una sesión gráfica real, no solo con `QT_QPA_PLATFORM=offscreen`.
+---
+
+## Privacidad
+
+- **No** se conecta a internet
+- **No** envía telemetría
+- **No** utiliza claves API
+- **No** accede a archivos fuera de su directorio de datos
+- Todos los datos se almacenan localmente en `~/.local/share/neuro-prompt-semantic-compiler/`
+
+Auditoría de privacidad específica: [`docs/PUBLICATION_PRIVACY_AUDIT.md`](docs/PUBLICATION_PRIVACY_AUDIT.md).
+
+---
+
+## Roadmap
+
+- [ ] Instalador Linux empaquetado (AppImage / Flatpak)
+- [ ] Más temas visuales
+- [ ] Más idiomas
+- [ ] Plugins de exportación
+- [ ] Formato de intercambio offline de plantillas
+- [ ] Capturas reales y demo web enriquecida (build TypeScript)
+
+Detalles de empaquetado: [`docs/FINAL_PATH_AUDIT.md`](docs/FINAL_PATH_AUDIT.md).
+
+---
+
+## Capturas
+
+*Las capturas reales de la aplicación se añadirán en una actualización futura. Mientras tanto, la [demo web estática](web-demo/) ofrece una vista previa visual del flujo principal.*
+
+---
+
+## Contribuir
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Haz un fork del repositorio.
+2. Crea una rama para tu feature.
+3. Asegúrate de que `pytest` y `scripts/smoke_test.sh` pasen.
+4. Envía un pull request.
+
+Más detalles en [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+---
 
 ## Licencia
 
-Este proyecto se distribuye bajo la licencia MIT. Ver `LICENSE` para más detalles.
+Este proyecto se distribuye bajo la licencia **MIT**. Ver [`LICENSE`](LICENSE).
+
+---
+
+## Idioma
+
+Este README también está disponible en inglés: [`README.md`](README.md).
