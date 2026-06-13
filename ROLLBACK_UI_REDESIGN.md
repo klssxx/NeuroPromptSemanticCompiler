@@ -2,7 +2,7 @@
 
 ## Backup
 
-`/home/klsx/NEUROapp/NeuroPromptSemanticCompiler/_backups/mode-redesign-20260609-025641/`
+`<project-root>/_backups/mode-redesign-20260609-025641/`
 
 ## Archivos modificados
 
@@ -15,8 +15,8 @@
 ## Rollback
 
 ```bash
-B="/home/klsx/NEUROapp/NeuroPromptSemanticCompiler/_backups/mode-redesign-20260609-025641"
-P="/home/klsx/NEUROapp/NeuroPromptSemanticCompiler"
+B="<project-root>/_backups/mode-redesign-20260609-025641"
+P="<project-root>"
 cp "$B/src/npsc_gui/main_window.py" "$P/src/npsc_gui/main_window.py"
 cp "$B/src/npsc_gui/theme.py" "$P/src/npsc_gui/theme.py"
 cp "$B/src/npsc_gui/settings.py" "$P/src/npsc_gui/settings.py"
@@ -27,5 +27,5 @@ cp "$B/tests/test_glossary_ux.py" "$P/tests/test_glossary_ux.py"
 ## Relaunch
 
 ```bash
-cd /home/klsx/NEUROapp/NeuroPromptSemanticCompiler && bash run_gui.sh
+cd <project-root> && bash run_gui.sh
 ```

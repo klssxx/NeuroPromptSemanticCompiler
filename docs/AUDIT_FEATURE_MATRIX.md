@@ -1,7 +1,7 @@
 # AUDIT FEATURE MATRIX — NeuroPromptSemanticCompiler
 
 **Fecha:** 2026-06-13
-**Ruta inspeccionada:** `/home/klsx/NEUROapp/NeuroPromptSemanticCompiler/`
+**Ruta inspeccionada:** `<project-root>/`
 **Python:** 3.12.13 (venv) | **PySide6:** 6.11.1
 **GUI Smoke Test:** PASS (9 páginas, 9 nav items)
 

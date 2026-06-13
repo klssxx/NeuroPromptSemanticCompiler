@@ -18,7 +18,7 @@
 ## Comandos de verificación
 
 ```bash
-cd /home/klsx/NEUROapp/NeuroPromptSemanticCompiler
+cd <project-root>
 PYTHONPATH=src .venv/bin/python -m pytest tests/ --tb=short
 bash run_gui.sh
 ```

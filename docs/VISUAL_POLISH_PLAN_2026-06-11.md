@@ -1,6 +1,6 @@
 # Visual Polish Plan — NPSC v1.0.0rc2
 
-Target: `/home/klsx/NEUROapp/NeuroPromptSemanticCompiler/`
+Target: `<project-root>/`
 Scope: **OPTION 2** (medium polish + one new component area)
 Date: 2026-06-11
 Base hardware: i5 / GTX 660 Kepler / 12 GB RAM / CachyOS KDE X11
@@ -51,8 +51,8 @@ Base hardware: i5 / GTX 660 Kepler / 12 GB RAM / CachyOS KDE X11
 ## Plan de rollback (si algo falla)
 
 ```bash
-B="/home/klsx/NEUROapp/NeuroPromptSemanticCompiler/_backups/pre-visual-polish-20260611-XXXXXX"
-P="/home/klsx/NEUROapp/NeuroPromptSemanticCompiler"
+B="<project-root>/_backups/pre-visual-polish-20260611-XXXXXX"
+P="<project-root>"
 cp "$B/src/npsc_gui/main_window.py" "$P/src/npsc_gui/main_window.py"
 cp "$B/src/npsc_gui/theme.py" "$P/src/npsc_gui/theme.py"
 cp "$B/src/npsc_gui/components/health_dashboard.py" "$P/src/npsc_gui/components/health_dashboard.py"

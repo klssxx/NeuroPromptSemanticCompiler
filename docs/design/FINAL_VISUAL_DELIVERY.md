@@ -110,7 +110,7 @@ To revert to previous visual:
 
 All test commands can be re-run from the project root:
 ```bash
-cd "/home/klsx/NEURO APP/NeuroPromptSemanticCompiler"
+cd "<project-root>"
 bash verify_app.sh
 bash tools/verify_project.sh
 ```
@@ -163,7 +163,7 @@ bash tools/verify_project.sh
 
 ```bash
 # From source
-cd "/home/klsx/NEURO APP/NeuroPromptSemanticCompiler"
+cd "<project-root>"
 ./run_gui.sh
 
 # From installed binary
@@ -173,7 +173,7 @@ cd "/home/klsx/NEURO APP/NeuroPromptSemanticCompiler"
 ~/.local/bin/npsc --text "Tu prompt" --out /tmp/out --target gpt --profile auto
 
 # Verify
-cd "/home/klsx/NEURO APP/NeuroPromptSemanticCompiler"
+cd "<project-root>"
 bash verify_app.sh
 ```
 

@@ -1,23 +1,23 @@
 # FINAL PATH AUDIT — NeuroPromptSemanticCompiler
 
 **Fecha:** 2026-06-13
-**Inode verificacion:** Ambas rutas son la MISMA carpeta (bind mount / hardlink a mismo inode)
+**Verificacion:** Las rutas locales originales fueron redacted para publicacion; el repositorio no debe depender de rutas absolutas del mantenedor.
 
 ## Rutas inspeccionadas
 
 | Ruta absoluta | Inode | Tipo | Contenido |
 |---|---|---|---|
-| `/home/klsx/NEUROapp/NeuroPromptSemanticCompiler/` | 23072695 | directorio (real) | Repositorio principal con `.git/` |
-| `/home/klsx/Escritorio/klsx/NEUROapp/NeuroPromptSemanticCompiler/` | 23072695 | mismo directorio | Mismo inode — es la misma carpeta |
+| `<project-root>/` | n/a | directorio fuente | Repositorio principal con `.git/` |
+| `<project-root-alias>/` | n/a | alias local opcional | Misma carpeta en el entorno original de desarrollo |
 
 ## Conclusion
 
-No existen duplicados. Las dos rutas apuntan al **mismo directorio** mediante el mismo inode.
-El escritorio de KDE plasma típicamente monta `$HOME/Escritorio` como referencia a `$HOME`.
+En el entorno original de desarrollo no existian duplicados reales: las rutas locales inspeccionadas apuntaban al mismo directorio. Para publicacion, este documento usa placeholders y evita depender de rutas absolutas del mantenedor.
+El escritorio de KDE plasma puede exponer aliases locales como `$HOME/Escritorio`; esos aliases no son requisitos del proyecto.
 
 ## Version definitiva
 
-**Ruta canonica:** `/home/klsx/NEUROapp/NeuroPromptSemanticCompiler/`
+**Ruta canonica:** `<project-root>/`
 
 - Ultimo commit: `79d6261 feat: initial commit — NeuroPrompt Semantic Compiler v1.0.0`
 - 16 archivos de test en `tests/`
@@ -27,8 +27,8 @@ El escritorio de KDE plasma típicamente monta `$HOME/Escritorio` como referenci
 
 ## Entregas Ubicacion
 
-**Ruta canonica de entregas:** `/home/klsx/NEUROapp/DELIVERIES/`
-(inode 25040548 — unico, no duplicado)
+**Ruta canonica de entregas:** `<deliveries-root>/`
+(ubicacion local de entregas del mantenedor; no requerida para ejecutar el proyecto)
 
 ## Motivo de seleccion
 
