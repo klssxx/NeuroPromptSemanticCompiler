@@ -1,3 +1,10 @@
+"""Tests for template_manager module.
+
+P1 fix (item 9): test_import_duplicate_id imports the same exported
+template file twice. On the second import the manager must either raise
+ValueError or return the existing template unchanged — it must NOT
+silently overwrite the stored entry.
+"""
 from __future__ import annotations
 
 import unittest
@@ -80,10 +87,14 @@ class TemplateManagerTests(unittest.TestCase):
         """P1 fix item 9: importing a template whose ID already exists must
         not silently overwrite the stored entry.
 
-        Acceptable outcomes:
-          - Raises ValueError (preferred — explicit rejection).
-          - Returns the existing template unchanged (idempotent merge).
-        Unacceptable: silent overwrite or ghost duplicate.
+        Acceptable outcomes
+        -------------------
+        - Raises ``ValueError`` (preferred).
+        - Returns the *existing* template unchanged (idempotent merge).
+
+        Unacceptable outcome
+        --------------------
+        - Silently overwrites stored content.
         """
         original_content = "Original content — must not be overwritten"
         tpl = PromptTemplate(id="dup-1", name="Original", content=original_content)
@@ -93,12 +104,14 @@ class TemplateManagerTests(unittest.TestCase):
 
         try:
             result = self.mgr.import_template(export_path)
+            # Idempotent path: content must not have been overwritten
             self.assertEqual(
                 result.content,
                 original_content,
                 "import_template silently overwrote an existing template",
             )
         except ValueError:
-            pass
+            pass  # Explicit rejection is also correct
 
+        # Either way: no ghost duplicate
         self.assertEqual(self.mgr.count(), 1)
