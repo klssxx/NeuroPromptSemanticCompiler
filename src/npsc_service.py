@@ -125,6 +125,18 @@ def evaluate_strict(report: dict[str, Any], policy: dict[str, Any] | None = None
 
 
 def compile_prompt(request: CompileRequest) -> dict[str, Any]:
+    """Full compilation pipeline with privacy, strict policy, audit trail and artifact export.
+
+    Raises:
+        ValueError: If ``request.original`` is empty or whitespace-only.
+            This guardrail is enforced at the service boundary regardless of
+            whether the caller ran ``field_validator.validate_compile_form``
+            first, so no empty prompt can reach the semantic extractor.
+    """
+    # --- guardrail: enforce non-empty prompt at service boundary ---
+    if not request.original.strip():
+        raise ValueError("empty_prompt: original prompt must not be blank")
+
     dictionary = load_semantic_dictionary()
     model_profiles = load_model_profiles()
     compilation_profiles = load_compilation_profiles()
@@ -412,7 +424,31 @@ def result_json_for_console(result: dict[str, Any], artifacts: list[str] | None 
 
 
 def compile_for_gui(original: str, target: str, requested_profile: str, requested_level: str) -> dict[str, Any]:
-    """Lightweight compile path for GUI/tests — no privacy, no export, no token report."""
+    """Lightweight compile path for GUI — no privacy scrubbing, no strict policy,
+    no policy_layer, no run_id persistence, no token report.
+
+    This function is intentionally a subset of ``compile_prompt``.  The
+    differences are by design (GUI speed / no-export path) but must be
+    understood by maintainers:
+
+    * **Privacy**: no ``privacy_mode`` / ``scrub_private_payload`` applied.
+      The GUI never persists output to disk, so the original prompt is not
+      stored, but callers must not log or cache the return value externally.
+    * **Strict policy**: ``evaluate_strict`` and ``strict_policy`` are not
+      called.  If strict compilation is needed from the GUI, route through
+      ``compile_prompt`` with a ``CompileRequest``.
+    * **policy_layer**: not injected into semantics.  The GUI result therefore
+      lacks the product-policy audit trail present in CLI artifacts.
+    * **run_id / created_at**: not included in the return dict.  If the caller
+      needs an audit trail, use ``compile_prompt`` + ``export_artifacts``.
+
+    Raises:
+        ValueError: If ``original`` is empty or whitespace-only.
+    """
+    # --- guardrail: same invariant as compile_prompt ---
+    if not original.strip():
+        raise ValueError("empty_prompt: original prompt must not be blank")
+
     dictionary = load_semantic_dictionary()
     model_profiles = load_model_profiles()
     compilation_profiles = load_compilation_profiles()
