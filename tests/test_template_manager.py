@@ -75,3 +75,30 @@ class TemplateManagerTests(unittest.TestCase):
         imported = self.mgr.import_template(export_path)
         self.assertEqual(imported.content, "Hello {{x}}")
         self.assertEqual(imported.category, "Test")
+
+    def test_import_duplicate_id(self) -> None:
+        """P1 fix item 9: importing a template whose ID already exists must
+        not silently overwrite the stored entry.
+
+        Acceptable outcomes:
+          - Raises ValueError (preferred — explicit rejection).
+          - Returns the existing template unchanged (idempotent merge).
+        Unacceptable: silent overwrite or ghost duplicate.
+        """
+        original_content = "Original content — must not be overwritten"
+        tpl = PromptTemplate(id="dup-1", name="Original", content=original_content)
+        self.mgr.create(tpl)
+
+        export_path = self.mgr.export_template("dup-1", Path(self.tmpdir) / "dup.json")
+
+        try:
+            result = self.mgr.import_template(export_path)
+            self.assertEqual(
+                result.content,
+                original_content,
+                "import_template silently overwrote an existing template",
+            )
+        except ValueError:
+            pass
+
+        self.assertEqual(self.mgr.count(), 1)

@@ -35,10 +35,24 @@ class VersionHistoryTests(unittest.TestCase):
         self.assertEqual(self.hist.count(), 0)
 
     def test_persistence(self) -> None:
-        self.hist.create_version(name="Persist", content="Data")
-        # Create a new instance pointing to the same directory
+        """P1 fix item 8: persisted version must survive a new instance.
+
+        Asserts both count and the actual name and content of the
+        serialized entry. A serialization bug that zeroes or corrupts
+        content would previously pass (only count was checked).
+        """
+        expected_name = "Persist"
+        expected_content = "Serialization regression sentinel content 12345"
+        ver = self.hist.create_version(name=expected_name, content=expected_content)
+        saved_id = ver.id
+
         hist2 = VersionHistory(storage_dir=self.tmpdir)
         self.assertEqual(hist2.count(), 1)
+
+        restored = hist2.get(saved_id)
+        self.assertIsNotNone(restored, "Version not found after reload")
+        self.assertEqual(restored.name, expected_name)
+        self.assertEqual(restored.content, expected_content)
 
 
 class DiffTests(unittest.TestCase):
@@ -59,7 +73,6 @@ class DiffTests(unittest.TestCase):
         old = "hello world\nline2"
         new = "hello python\nline2"
         result = compute_diff(old, new)
-        # Line-level diff: the entire line is marked as removed/added
         self.assertIn("hello world", result["removed"])
         self.assertIn("hello python", result["added"])
 
