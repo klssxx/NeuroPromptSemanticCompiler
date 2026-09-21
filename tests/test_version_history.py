@@ -1,3 +1,9 @@
+"""Tests for version_history module.
+
+P1 fix (item 8): test_persistence now asserts *name* and *content* of
+the persisted version, not only the count.  A serialization regression
+that corrupts or zeroes the content field will now be caught.
+"""
 from __future__ import annotations
 
 import unittest
@@ -37,15 +43,16 @@ class VersionHistoryTests(unittest.TestCase):
     def test_persistence(self) -> None:
         """P1 fix item 8: persisted version must survive a new instance.
 
-        Asserts both count and the actual name and content of the
-        serialized entry. A serialization bug that zeroes or corrupts
-        content would previously pass (only count was checked).
+        Asserts count AND the actual name and content of the serialized
+        entry.  Previously only count was checked — a bug that zeros or
+        corrupts the content field would have passed undetected.
         """
         expected_name = "Persist"
         expected_content = "Serialization regression sentinel content 12345"
         ver = self.hist.create_version(name=expected_name, content=expected_content)
         saved_id = ver.id
 
+        # New instance — no in-memory state carried over
         hist2 = VersionHistory(storage_dir=self.tmpdir)
         self.assertEqual(hist2.count(), 1)
 
