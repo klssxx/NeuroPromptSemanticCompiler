@@ -5,7 +5,7 @@ description = "Semantic prompt compiler that converts messy prompts into NSL and
 requires-python = ">=3.10"
 readme = "README.md"
 authors = [{name = "NeuroPrompt Team"}]
-dependencies = ["PySide6>=6.11"]
+dependencies = ["PySide6>=6.11,<6.13"]
 
 [project.scripts]
 npsc = "npsc_cli:run_cli"
@@ -16,14 +16,17 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = {"-" = "src"}
 py-modules = [
+  # Core service & pipeline
   "benchmark_quality",
   "compilation_profiles",
   "compiler_defaults",
   "constraint_normalizer",
   "context_loss_verifier",
   "exporters",
+  "export_manager",
+  "field_validator",
   "hybrid_output",
   "i18n",
   "model_adapter",
@@ -40,8 +43,11 @@ py-modules = [
   "semantic_extractor",
   "semantic_ir",
   "semantic_seed_mapper",
+  "template_manager",
   "token_estimator",
-  "utils"
+  "utils",
+  "variables",
+  "version_history"
 ]
 
 [tool.setuptools.packages.find]
