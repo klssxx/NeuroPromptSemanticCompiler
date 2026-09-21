@@ -26,53 +26,85 @@ class FieldValidationResult:
         }
 
 
+# Default known targets; callers may override with their loaded model_profiles.
+_DEFAULT_TARGETS = frozenset({
+    "codex", "gpt4", "gpt4o", "claude", "gemini", "mistral",
+    "llama", "generic", "auto",
+})
+
+
 def validate_compile_form(
     prompt: str,
     variables: dict[str, str] | None = None,
     required_fields: list[str] | None = None,
     strict: bool = False,
+    target: str | None = None,
+    available_targets: set[str] | frozenset[str] | None = None,
 ) -> FieldValidationResult:
     """Validate a compilation form before processing.
-    
+
     Args:
         prompt: The prompt text to compile.
-        variables: If prompt contains {{var}} substitutions, the provided values.
-        required_fields: List of field names that must be non-empty.
-        strict: If True, warnings become errors.
-    
+        variables: {{var}} substitution values, keyed by variable name.
+        required_fields: Field names that must be non-empty in *variables*.
+        strict: When True, warnings are promoted to errors.
+        target: The compilation target selected by the user/UI.
+        available_targets: Set of valid target identifiers loaded from
+            model_profiles.  Defaults to _DEFAULT_TARGETS.
+
     Returns:
         FieldValidationResult with errors and warnings.
     """
     result = FieldValidationResult()
     variables = variables or {}
     required_fields = required_fields or []
+    known_targets = available_targets if available_targets is not None else _DEFAULT_TARGETS
 
-    # Check empty prompt
+    # --- prompt presence ---
     if not prompt.strip():
         result.add_error("prompt", "empty_prompt")
-        return result  # No point checking further
+        return result
 
-    # Check for unfilled variables
+    # --- target validation (was placeholder) ---
+    if target is not None:
+        normalised = target.strip().lower()
+        if normalised not in known_targets:
+            msg = f"unknown_target: {target!r}. Known targets: {', '.join(sorted(known_targets))}"
+            if strict:
+                result.add_error("target", msg)
+            else:
+                result.add_warning("target", msg)
+
+    # --- variable detection and fill-status ---
     from variables import detect_variables, build_fill_form
     detected = detect_variables(prompt)
     if detected:
         form = build_fill_form(prompt)
         unfilled = form.unfilled()
-        filled = [v for v in detected if v not in unfilled]
 
         if unfilled:
-            msg = f"unfilled_variables: {', '.join(unfilled)}"
+            msg = f"unfilled_variables: {', '.join(sorted(unfilled))}"
             if strict:
                 result.add_error("variables", msg)
             else:
                 result.add_warning("variables", msg)
 
-        # Check provided variables vs detected
+        # Warn on empty-string values (invisible gap in compiled prompt)
+        empty_valued = [
+            name for name in detected
+            if name in variables and variables[name] == ""
+        ]
+        if empty_valued:
+            result.add_warning(
+                "variables",
+                f"empty_variable_value: {', '.join(sorted(empty_valued))}",
+            )
+
         extra_vars = set(variables.keys()) - set(detected)
         if extra_vars:
             result.add_warning("variables", f"unused_variables: {', '.join(sorted(extra_vars))}")
 
-    # Check required fields
+    # --- required fields ---
     for req_field in required_fields:
         value = variables.get(req_field, "")
         if not value.strip():
@@ -81,15 +113,12 @@ def validate_compile_form(
             else:
                 result.add_warning(req_field, f"recommended_field_empty: {req_field}")
 
-    # Check prompt length (warn if very short or very long)
+    # --- prompt length ---
     prompt_len = len(prompt.strip())
     if prompt_len < 10:
         result.add_warning("prompt", "prompt_too_short")
     elif prompt_len > 50000:
         result.add_warning("prompt", "prompt_very_long")
-
-    # Check if target/model selection is generic
-    # (this would need to be passed in; placeholder for now)
 
     return result
 
@@ -97,8 +126,16 @@ def validate_compile_form(
 def validate_export_form(
     result_data: dict[str, Any],
     export_formats: list[str] | None = None,
+    strict: bool = False,
 ) -> FieldValidationResult:
-    """Validate before exporting a result."""
+    """Validate before exporting a result.
+
+    Args:
+        result_data: The compiled result dict produced by compile_prompt /
+            compile_for_gui.
+        export_formats: List of requested export format names.
+        strict: When True, warnings about missing compiled output become errors.
+    """
     result = FieldValidationResult()
     export_formats = export_formats or ["markdown", "json", "txt"]
 
@@ -106,15 +143,25 @@ def validate_export_form(
         result.add_error("result", "no_result_to_export")
         return result
 
-    # Check for required result fields
-    if "optimized_prompt" not in result_data and "chosen_nsl" not in result_data:
-        result.add_warning("result", "no_compiled_output")
+    # Fix: OR condition — warn/error when EITHER compiled field is missing.
+    missing_prompt = "optimized_prompt" not in result_data
+    missing_nsl = "chosen_nsl" not in result_data
+    if missing_prompt or missing_nsl:
+        missing = []
+        if missing_prompt:
+            missing.append("optimized_prompt")
+        if missing_nsl:
+            missing.append("chosen_nsl")
+        msg = f"no_compiled_output: missing fields: {', '.join(missing)}"
+        if strict:
+            result.add_error("result", msg)
+        else:
+            result.add_warning("result", msg)
 
-    # Validate format support
     supported = {"markdown", "json", "txt"}
     unknown = set(export_formats) - supported
     if unknown:
-        result.add_warning("formats", f"unsupported_formats: {', '.join(unknown)}")
+        result.add_warning("formats", f"unsupported_formats: {', '.join(sorted(unknown))}")
 
     return result
 
