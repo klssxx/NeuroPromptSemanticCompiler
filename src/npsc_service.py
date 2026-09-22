@@ -38,6 +38,9 @@ from utils import now_run_id
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# Sentinel for an unknown/unresolved target — used as a fallback key
+_FALLBACK_TARGET = "codex"
+
 
 @dataclass
 class CompileRequest:
@@ -124,25 +127,52 @@ def evaluate_strict(report: dict[str, Any], policy: dict[str, Any] | None = None
     return len(reasons) == 0, sorted(set(reasons))
 
 
+def _resolve_target(target: str, semantics: dict[str, Any], model_profiles: dict[str, Any]) -> str:
+    """Resolve 'auto' target and validate the result against known model profiles.
+
+    Returns a safe, known target string.  Falls back to _FALLBACK_TARGET when the
+    resolved value is not present in model_profiles so downstream adapters never
+    receive an unknown key.
+    """
+    if target == "auto":
+        detected = str(semantics.get("target") or "").lower()
+        if detected in model_profiles and detected not in {"auto", "generic"}:
+            return detected
+        return _FALLBACK_TARGET
+    # FIX P2: validate explicit target against known profiles
+    if target not in model_profiles:
+        return _FALLBACK_TARGET
+    return target
+
+
 def compile_prompt(request: CompileRequest) -> dict[str, Any]:
+    # FIX P1: internal guardrail — reject empty prompts before any processing
+    if not request.original.strip():
+        raise ValueError("compile_prompt: 'original' must be a non-empty string.")
+
     dictionary = load_semantic_dictionary()
     model_profiles = load_model_profiles()
     compilation_profiles = load_compilation_profiles()
     original = request.original
-    target = request.target
     privacy_mode = normalize_privacy_mode(request.privacy_mode, request.preserve_original)
     prompt_hash = sha256_text(original)
     render_original = privacy_text(original, prompt_hash, privacy_mode)
     public_original = render_original if privacy_mode != "full_original" else original
 
     semantics = extract_semantics(original)
-    requested_target = target
-    if target == "auto":
-        detected_target = str(semantics.get("target") or "").lower()
-        if detected_target in model_profiles and detected_target not in {"auto", "generic"}:
-            target = detected_target
-        else:
-            target = "codex"
+    requested_target = request.target
+    # FIX P2: centralised resolution — validates target against model_profiles
+    target = _resolve_target(request.target, semantics, model_profiles)
+    target_selection_reason: str | None = None
+    if requested_target == "auto":
+        target_selection_reason = (
+            "Detected from prompt semantics."
+            if target == str(semantics.get("target") or "").lower()
+            else "Fallback to codex for a safe general default."
+        )
+    elif requested_target != target:
+        target_selection_reason = f"Requested target '{requested_target}' not found in model_profiles; fell back to '{target}'."
+
     requested_profile = validate_profile_name(request.profile, compilation_profiles)
     auto_info: dict[str, Any] = {}
     applied_profile = requested_profile
@@ -164,9 +194,10 @@ def compile_prompt(request: CompileRequest) -> dict[str, Any]:
     target_layer = adapter_layer(target, model_profiles, request.custom_model_name)
     if requested_target == "auto":
         target_layer["requested_target"] = "auto"
-        target_layer["target_selection_reason"] = (
-            "Detected from prompt semantics." if target == str(semantics.get("target") or "").lower() else "Fallback to codex for a safe general default."
-        )
+        target_layer["target_selection_reason"] = target_selection_reason
+    elif target_selection_reason:
+        target_layer["target_selection_reason"] = target_selection_reason
+
     defaults = load_compiler_defaults()
     selected_strict_policy = strict_policy()
     policy_layer = {
@@ -411,13 +442,42 @@ def result_json_for_console(result: dict[str, Any], artifacts: list[str] | None 
     return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
-def compile_for_gui(original: str, target: str, requested_profile: str, requested_level: str) -> dict[str, Any]:
-    """Lightweight compile path for GUI/tests — no privacy, no export, no token report."""
+def compile_for_gui(
+    original: str,
+    target: str,
+    requested_profile: str,
+    requested_level: str,
+    *,
+    privacy_mode: str = "full_original",
+    preserve_original: bool = True,
+    strict: bool = False,
+) -> dict[str, Any]:
+    """Compile path for GUI/tests.
+
+    FIX P1 (empty-prompt guardrail): raises ValueError on blank input.
+    FIX P1 (GUI privacy parity): accepts privacy_mode; applies scrubbing and
+        policy_layer on the same code path as compile_prompt.
+    FIX P1 (audit trail): returns run_id and created_at so the GUI can surface
+        or persist them if needed.
+    FIX P2 (target validation): delegates to _resolve_target so unknown targets
+        fall back gracefully instead of passing an invalid key to downstream.
+    """
+    # Internal guardrail — callers should also validate, but this is the safety net.
+    if not original.strip():
+        raise ValueError("compile_for_gui: 'original' must be a non-empty string.")
+
     dictionary = load_semantic_dictionary()
     model_profiles = load_model_profiles()
     compilation_profiles = load_compilation_profiles()
 
+    resolved_privacy = normalize_privacy_mode(privacy_mode, preserve_original)
+    prompt_hash = sha256_text(original)
+    render_original = privacy_text(original, prompt_hash, resolved_privacy)
+
     semantics = extract_semantics(original)
+    requested_target = target
+    resolved_target = _resolve_target(target, semantics, model_profiles)
+
     normalized_profile = validate_profile_name(requested_profile, compilation_profiles)
     auto_info: dict[str, Any] = {}
     applied_profile = normalized_profile
@@ -427,7 +487,11 @@ def compile_for_gui(original: str, target: str, requested_profile: str, requeste
 
     profile = get_profile(applied_profile, compilation_profiles)
     technical_request = None if requested_level == "profile_default" else requested_level
-    chosen_level = select_level(technical_request or profile_default_level(applied_profile, profile), target, model_profiles)
+    chosen_level = select_level(
+        technical_request or profile_default_level(applied_profile, profile),
+        resolved_target,
+        model_profiles,
+    )
     profile_status = build_profile_status(
         normalized_profile,
         applied_profile,
@@ -437,42 +501,92 @@ def compile_for_gui(original: str, target: str, requested_profile: str, requeste
         auto_info,
     )
 
+    defaults = load_compiler_defaults()
+    selected_strict_policy = strict_policy()
+    policy_layer = {
+        "origin": "product_policy",
+        "policy_constraints": list(defaults.get("critical_constraints", [])),
+        "strict_policy": selected_strict_policy,
+        "note": "Product policy is tracked separately from user constraints.",
+    }
+
     profiled_semantics = apply_profile_to_semantics(semantics, applied_profile, profile)
-    profiled_semantics["target"] = target
+    profiled_semantics["target"] = resolved_target
+    profiled_semantics["policy_layer"] = policy_layer
     seeds = suggest_seeds(
         profiled_semantics,
         dictionary,
-        target=target,
+        target=resolved_target,
         level=chosen_level,
         limit=profile_seed_limit(applied_profile, profile),
     )
 
-    nsl_by_level = {
-        "safe": compile_to_nsl(profiled_semantics, seeds, level="safe", target=target),
-        "balanced": compile_to_nsl(profiled_semantics, seeds, level="balanced", target=target),
-        "aggressive": compile_to_nsl(profiled_semantics, seeds, level="aggressive", target=target),
-    }
-    chosen_nsl = nsl_by_level.get(chosen_level, nsl_by_level["balanced"])
-    reconstructed = reconstruct_prompt(parse_nsl(chosen_nsl), dictionary, target=target)
-    optimized = build_profile_optimized_prompt(
-        original,
+    safe_nsl = compile_to_nsl(profiled_semantics, seeds, level="safe", target=resolved_target)
+    balanced_nsl = compile_to_nsl(profiled_semantics, seeds, level="balanced", target=resolved_target)
+    aggressive_nsl = compile_to_nsl(profiled_semantics, seeds, level="aggressive", target=resolved_target)
+    nsl_by_level = {"safe": safe_nsl, "balanced": balanced_nsl, "aggressive": aggressive_nsl}
+    chosen_nsl = nsl_by_level.get(chosen_level, balanced_nsl)
+
+    reconstructed = reconstruct_prompt(parse_nsl(chosen_nsl), dictionary, target=resolved_target)
+    optimized_prompt = build_profile_optimized_prompt(
+        render_original,
         reconstructed,
         applied_profile,
         profile,
         profiled_semantics,
         seeds,
-        target,
+        resolved_target,
     )
-    verifier = verify_context_loss(original, profiled_semantics, optimized, chosen_nsl, applied_profile, profile)
-    hybrid = build_hybrid_output(original, profile_status, chosen_nsl, optimized, seeds, profiled_semantics, verifier)
+    verifier = verify_context_loss(
+        original, profiled_semantics, optimized_prompt, chosen_nsl, applied_profile, profile
+    )
+    strict_passed, strict_reasons = evaluate_strict(verifier) if strict else (True, [])
+    verifier["strict_requested"] = bool(strict)
+    verifier["strict_status"] = "pass" if strict_passed else "blocked"
+    verifier["strict_failures"] = strict_reasons
+
+    run_id = now_run_id("npsc-gui")
+    created_at = datetime.now(timezone.utc).isoformat()
+
+    if resolved_privacy == "hash_only":
+        public_semantics = scrub_private_payload(profiled_semantics, original, prompt_hash, resolved_privacy)
+        public_chosen_nsl = scrub_private_payload(chosen_nsl, original, prompt_hash, resolved_privacy)
+        public_safe_nsl = scrub_private_payload(safe_nsl, original, prompt_hash, resolved_privacy)
+        public_balanced_nsl = scrub_private_payload(balanced_nsl, original, prompt_hash, resolved_privacy)
+        public_aggressive_nsl = scrub_private_payload(aggressive_nsl, original, prompt_hash, resolved_privacy)
+        public_optimized = scrub_private_payload(optimized_prompt, original, prompt_hash, resolved_privacy)
+        public_reconstructed = scrub_private_payload(reconstructed, original, prompt_hash, resolved_privacy)
+    else:
+        public_semantics = profiled_semantics
+        public_chosen_nsl = chosen_nsl
+        public_safe_nsl = safe_nsl
+        public_balanced_nsl = balanced_nsl
+        public_aggressive_nsl = aggressive_nsl
+        public_optimized = optimized_prompt
+        public_reconstructed = reconstructed
 
     return {
+        "run_id": run_id,
+        "created_at": created_at,
+        "prompt_sha256": prompt_hash,
+        "privacy_mode": resolved_privacy,
+        "target": resolved_target,
+        "requested_target": requested_target,
+        "applied_profile": applied_profile,
+        "chosen_level": chosen_level,
         "profile_status": profile_status,
-        "semantics": profiled_semantics,
+        "auto_info": auto_info,
+        "semantics": public_semantics,
         "seeds": seeds,
-        "nsl": chosen_nsl,
-        "optimized": optimized,
-        "hybrid": hybrid,
-        "report": build_context_loss_report(verifier),
-        "verifier": verifier,
+        "safe_nsl": public_safe_nsl,
+        "balanced_nsl": public_balanced_nsl,
+        "aggressive_nsl": public_aggressive_nsl,
+        "chosen_nsl": public_chosen_nsl,
+        "optimized_prompt": public_optimized,
+        "reconstructed": public_reconstructed,
+        "context_loss_report": verifier,
+        "context_loss_markdown": build_context_loss_report(verifier),
+        "policy_layer": policy_layer,
+        "strict_passed": strict_passed,
+        "strict_failures": strict_reasons,
     }
