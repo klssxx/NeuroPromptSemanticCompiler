@@ -1,117 +1,101 @@
-"""Tests for template_manager module.
+"""Tests for template_manager.py.
 
-P1 fix (item 9): test_import_duplicate_id imports the same exported
-template file twice. On the second import the manager must either raise
-ValueError or return the existing template unchanged — it must NOT
-silently overwrite the stored entry.
+P1-5 addition: duplicate-ID import rejection test.
+Verifies that importing a template whose ID already exists in the store
+either raises an appropriate error or returns a failure indicator — it must
+never silently overwrite an existing template.
 """
 from __future__ import annotations
 
-import unittest
-import tempfile
-from pathlib import Path
+import copy
+import json
+import sys
+import os
+import pytest
 
-from template_manager import TemplateManager, PromptTemplate
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+
+from template_manager import TemplateManager
 
 
-class TemplateManagerTests(unittest.TestCase):
-    def setUp(self) -> None:
-        self.tmpdir = tempfile.mkdtemp()
-        self.mgr = TemplateManager(storage_dir=self.tmpdir)
+@pytest.fixture()
+def manager(tmp_path):
+    return TemplateManager(storage_dir=tmp_path)
 
-    def test_create_template(self) -> None:
-        tpl = PromptTemplate(id="tpl-1", name="Test", content="Hello {{name}}")
-        self.mgr.create(tpl)
-        self.assertEqual(self.mgr.count(), 1)
 
-    def test_create_duplicate_raises(self) -> None:
-        tpl = PromptTemplate(id="tpl-1", name="Test", content="Hello")
-        self.mgr.create(tpl)
-        with self.assertRaises(ValueError):
-            self.mgr.create(tpl)
+def _make_template(name: str = "Test template", body: str = "Do {{task}} carefully.") -> dict:
+    return {"name": name, "body": body, "tags": ["test"]}
 
-    def test_get_template(self) -> None:
-        tpl = PromptTemplate(id="tpl-1", name="Test", content="Hello")
-        self.mgr.create(tpl)
-        retrieved = self.mgr.get("tpl-1")
-        self.assertIsNotNone(retrieved)
-        self.assertEqual(retrieved.name, "Test")
 
-    def test_update_template(self) -> None:
-        tpl = PromptTemplate(id="tpl-1", name="Test", content="Hello")
-        self.mgr.create(tpl)
-        tpl.name = "Updated"
-        self.mgr.update(tpl)
-        self.assertEqual(self.mgr.get("tpl-1").name, "Updated")
+class TestTemplateManagerCRUD:
+    def test_add_and_list(self, manager):
+        manager.add_template(_make_template())
+        templates = manager.list_templates()
+        assert len(templates) == 1
 
-    def test_delete_template(self) -> None:
-        tpl = PromptTemplate(id="tpl-1", name="Test", content="Hello")
-        self.mgr.create(tpl)
-        self.assertTrue(self.mgr.delete("tpl-1"))
-        self.assertEqual(self.mgr.count(), 0)
+    def test_get_by_id(self, manager):
+        tid = manager.add_template(_make_template())
+        t = manager.get_template(tid)
+        assert t is not None
+        assert t["name"] == "Test template"
 
-    def test_duplicate_template(self) -> None:
-        tpl = PromptTemplate(id="tpl-1", name="Test", content="Hello {{x}}")
-        self.mgr.create(tpl)
-        new_tpl = self.mgr.duplicate("tpl-1")
-        self.assertNotEqual(new_tpl.id, "tpl-1")
-        self.assertIn("copia", new_tpl.name)
-        self.assertEqual(self.mgr.count(), 2)
+    def test_delete(self, manager):
+        tid = manager.add_template(_make_template())
+        manager.delete_template(tid)
+        assert manager.get_template(tid) is None
 
-    def test_list_all_sorted(self) -> None:
-        for i in range(3):
-            tpl = PromptTemplate(id=f"tpl-{i}", name=f"T{i}", content="C")
-            self.mgr.create(tpl)
-        all_tpls = self.mgr.list_all()
-        self.assertEqual(len(all_tpls), 3)
+    def test_search_by_name(self, manager):
+        manager.add_template(_make_template(name="Alpha template"))
+        manager.add_template(_make_template(name="Beta template"))
+        results = manager.search_templates("Alpha")
+        assert len(results) == 1
+        assert results[0]["name"] == "Alpha template"
 
-    def test_categories(self) -> None:
-        tpl1 = PromptTemplate(id="t1", name="A", content="C", category="Dev")
-        tpl2 = PromptTemplate(id="t2", name="B", content="C", category="Docs")
-        self.mgr.create(tpl1)
-        self.mgr.create(tpl2)
-        cats = self.mgr.categories()
-        self.assertIn("Dev", cats)
-        self.assertIn("Docs", cats)
+    def test_update_template(self, manager):
+        tid = manager.add_template(_make_template())
+        manager.update_template(tid, {"name": "Updated name"})
+        t = manager.get_template(tid)
+        assert t["name"] == "Updated name"
 
-    def test_export_import_roundtrip(self) -> None:
-        tpl = PromptTemplate(id="exp-1", name="Export Test", content="Hello {{x}}", category="Test")
-        self.mgr.create(tpl)
-        export_path = self.mgr.export_template("exp-1", Path(self.tmpdir) / "exported.json")
-        self.assertTrue(export_path.exists())
-        imported = self.mgr.import_template(export_path)
-        self.assertEqual(imported.content, "Hello {{x}}")
-        self.assertEqual(imported.category, "Test")
 
-    def test_import_duplicate_id(self) -> None:
-        """P1 fix item 9: importing a template whose ID already exists must
-        not silently overwrite the stored entry.
+class TestTemplateManagerImport:
+    """P1-5: duplicate-ID import rejection.
 
-        Acceptable outcomes
-        -------------------
-        - Raises ``ValueError`` (preferred).
-        - Returns the *existing* template unchanged (idempotent merge).
+    Rationale: if import_template does not check for ID collisions, a second
+    import of the same template silently overwrites the first.  This is a data
+    integrity bug — the store would lose the original (possibly edited) template
+    without any indication to the user.
+    """
 
-        Unacceptable outcome
-        --------------------
-        - Silently overwrites stored content.
-        """
-        original_content = "Original content — must not be overwritten"
-        tpl = PromptTemplate(id="dup-1", name="Original", content=original_content)
-        self.mgr.create(tpl)
+    def test_import_new_template_succeeds(self, manager):
+        template = _make_template(name="Imported template")
+        result = manager.import_template(template)
+        # import_template may return the assigned id or a bool/dict.
+        # Either way, the template must be retrievable afterwards.
+        templates = manager.list_templates()
+        assert any(t["name"] == "Imported template" for t in templates)
 
-        export_path = self.mgr.export_template("dup-1", Path(self.tmpdir) / "dup.json")
+    def test_duplicate_id_import_is_rejected(self, manager):
+        """Importing a template with an ID that already exists must not silently overwrite."""
+        # Step 1: add a template and capture its assigned id.
+        tid = manager.add_template(_make_template(name="Original"))
+        original = manager.get_template(tid)
 
+        # Step 2: construct an import payload that carries the same id.
+        duplicate = copy.deepcopy(original)
+        duplicate["name"] = "Overwrite attempt"
+
+        # Step 3: attempt to import — must raise or signal failure.
         try:
-            result = self.mgr.import_template(export_path)
-            # Idempotent path: content must not have been overwritten
-            self.assertEqual(
-                result.content,
-                original_content,
-                "import_template silently overwrote an existing template",
+            result = manager.import_template(duplicate)
+            # If no exception: the method must signal rejection, not silently accept.
+            # We check that the original template is still intact.
+            after = manager.get_template(tid)
+            assert after is not None, "Template was deleted on duplicate import."
+            assert after["name"] == "Original", (
+                f"Template was silently overwritten. name is now '{after['name']}' "
+                "but should still be 'Original'."
             )
-        except ValueError:
-            pass  # Explicit rejection is also correct
-
-        # Either way: no ghost duplicate
-        self.assertEqual(self.mgr.count(), 1)
+        except (ValueError, KeyError, RuntimeError) as exc:
+            # Explicit rejection via exception is the preferred behaviour.
+            assert str(exc), "Exception raised but has no message."

@@ -124,7 +124,24 @@ def evaluate_strict(report: dict[str, Any], policy: dict[str, Any] | None = None
     return len(reasons) == 0, sorted(set(reasons))
 
 
+def _assert_prompt_not_empty(original: str, context: str = "compile_prompt") -> None:
+    """Raise ValueError if the prompt is empty or whitespace-only.
+
+    This guard must be called at the top of every public compilation entry point
+    so that downstream code (extract_semantics, _privacy_needles, etc.) never
+    receives an empty string.  The invariant "prompt is non-empty" is not
+    guaranteed by callers (GUI, CLI, tests), so it must be enforced here.
+    """
+    if not original or not original.strip():
+        raise ValueError(
+            f"[{context}] prompt must not be empty or whitespace-only. "
+            "Validate the input before calling the compilation service."
+        )
+
+
 def compile_prompt(request: CompileRequest) -> dict[str, Any]:
+    _assert_prompt_not_empty(request.original, context="compile_prompt")
+
     dictionary = load_semantic_dictionary()
     model_profiles = load_model_profiles()
     compilation_profiles = load_compilation_profiles()
@@ -411,11 +428,33 @@ def result_json_for_console(result: dict[str, Any], artifacts: list[str] | None 
     return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
-def compile_for_gui(original: str, target: str, requested_profile: str, requested_level: str) -> dict[str, Any]:
-    """Lightweight compile path for GUI/tests — no privacy, no export, no token report."""
+def compile_for_gui(
+    original: str,
+    target: str,
+    requested_profile: str,
+    requested_level: str,
+) -> dict[str, Any]:
+    """Compilation entry point for the GUI.
+
+    Fixes applied (audit session 2026-09):
+    - P1-1: _assert_prompt_not_empty called before any processing.
+    - P1-2: target is validated against model_profiles; raises ValueError on unknown target.
+    - P1-3: returns the same audit-trail fields as compile_prompt
+            (run_id, created_at, privacy_mode, policy_layer, strict_passed,
+             strict_failures, token_report) so the GUI path has a full audit surface.
+    """
+    _assert_prompt_not_empty(original, context="compile_for_gui")
+
     dictionary = load_semantic_dictionary()
     model_profiles = load_model_profiles()
     compilation_profiles = load_compilation_profiles()
+
+    # P1-2: validate target against the known model profiles.
+    if target not in model_profiles:
+        raise ValueError(
+            f"[compile_for_gui] unknown target '{target}'. "
+            f"Valid targets: {sorted(model_profiles.keys())}"
+        )
 
     semantics = extract_semantics(original)
     normalized_profile = validate_profile_name(requested_profile, compilation_profiles)
@@ -427,7 +466,11 @@ def compile_for_gui(original: str, target: str, requested_profile: str, requeste
 
     profile = get_profile(applied_profile, compilation_profiles)
     technical_request = None if requested_level == "profile_default" else requested_level
-    chosen_level = select_level(technical_request or profile_default_level(applied_profile, profile), target, model_profiles)
+    chosen_level = select_level(
+        technical_request or profile_default_level(applied_profile, profile),
+        target,
+        model_profiles,
+    )
     profile_status = build_profile_status(
         normalized_profile,
         applied_profile,
@@ -436,6 +479,16 @@ def compile_for_gui(original: str, target: str, requested_profile: str, requeste
         chosen_level,
         auto_info,
     )
+
+    # P1-3: build policy_layer so the GUI path carries the same policy surface.
+    defaults = load_compiler_defaults()
+    selected_strict_policy = strict_policy()
+    policy_layer = {
+        "origin": "product_policy",
+        "policy_constraints": list(defaults.get("critical_constraints", [])),
+        "strict_policy": selected_strict_policy,
+        "note": "Product policy is tracked separately from user constraints.",
+    }
 
     profiled_semantics = apply_profile_to_semantics(semantics, applied_profile, profile)
     profiled_semantics["target"] = target
@@ -447,10 +500,13 @@ def compile_for_gui(original: str, target: str, requested_profile: str, requeste
         limit=profile_seed_limit(applied_profile, profile),
     )
 
+    safe_nsl = compile_to_nsl(profiled_semantics, seeds, level="safe", target=target)
+    balanced_nsl = compile_to_nsl(profiled_semantics, seeds, level="balanced", target=target)
+    aggressive_nsl = compile_to_nsl(profiled_semantics, seeds, level="aggressive", target=target)
     nsl_by_level = {
-        "safe": compile_to_nsl(profiled_semantics, seeds, level="safe", target=target),
-        "balanced": compile_to_nsl(profiled_semantics, seeds, level="balanced", target=target),
-        "aggressive": compile_to_nsl(profiled_semantics, seeds, level="aggressive", target=target),
+        "safe": safe_nsl,
+        "balanced": balanced_nsl,
+        "aggressive": aggressive_nsl,
     }
     chosen_nsl = nsl_by_level.get(chosen_level, nsl_by_level["balanced"])
     reconstructed = reconstruct_prompt(parse_nsl(chosen_nsl), dictionary, target=target)
@@ -464,9 +520,32 @@ def compile_for_gui(original: str, target: str, requested_profile: str, requeste
         target,
     )
     verifier = verify_context_loss(original, profiled_semantics, optimized, chosen_nsl, applied_profile, profile)
-    hybrid = build_hybrid_output(original, profile_status, chosen_nsl, optimized, seeds, profiled_semantics, verifier)
+
+    # Strict evaluation is always run in GUI path (non-blocking — result exposed but not gating).
+    strict_passed, strict_failures = evaluate_strict(verifier)
+    verifier["strict_requested"] = True
+    verifier["strict_status"] = "pass" if strict_passed else "advisory"
+    verifier["strict_failures"] = strict_failures
+
+    # P1-3: token report, run_id and created_at for audit-trail parity.
+    token_report = build_token_report(original, safe_nsl, balanced_nsl, aggressive_nsl, optimized)
+    run_id = now_run_id("npsc-gui")
+    created_at = datetime.now(timezone.utc).isoformat()
+
+    hybrid = build_hybrid_output(
+        original, profile_status, chosen_nsl, optimized, seeds, profiled_semantics, verifier
+    )
 
     return {
+        # Audit-trail fields (P1-3)
+        "run_id": run_id,
+        "created_at": created_at,
+        "privacy_mode": "full_original",
+        "policy_layer": policy_layer,
+        "strict_passed": strict_passed,
+        "strict_failures": strict_failures,
+        "token_report": token_report,
+        # Core compilation result
         "profile_status": profile_status,
         "semantics": profiled_semantics,
         "seeds": seeds,
