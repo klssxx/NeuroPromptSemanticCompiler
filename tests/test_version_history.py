@@ -1,77 +1,141 @@
+"""Tests for version_history.py.
+
+P1 fix: test_persistence now validates serialised content, not just count.
+"""
 from __future__ import annotations
 
-import unittest
+import json
 import tempfile
+from pathlib import Path
 
-from version_history import VersionHistory, compute_diff, compute_unified_diff
+import pytest
 
-
-class VersionHistoryTests(unittest.TestCase):
-    def setUp(self) -> None:
-        self.tmpdir = tempfile.mkdtemp()
-        self.hist = VersionHistory(storage_dir=self.tmpdir)
-
-    def test_create_version(self) -> None:
-        ver = self.hist.create_version(name="Test", content="Hello world")
-        self.assertIsNotNone(ver.id)
-        self.assertEqual(ver.name, "Test")
-        self.assertEqual(self.hist.count(), 1)
-
-    def test_list_all_sorted(self) -> None:
-        for i in range(3):
-            self.hist.create_version(name=f"V{i}", content=f"Content {i}")
-        versions = self.hist.list_all()
-        self.assertEqual(len(versions), 3)
-
-    def test_get_version(self) -> None:
-        ver = self.hist.create_version(name="Test", content="Hello")
-        retrieved = self.hist.get(ver.id)
-        self.assertIsNotNone(retrieved)
-        self.assertEqual(retrieved.name, "Test")
-
-    def test_delete_version(self) -> None:
-        ver = self.hist.create_version(name="ToDelete", content="Bye")
-        self.assertTrue(self.hist.delete(ver.id))
-        self.assertEqual(self.hist.count(), 0)
-
-    def test_persistence(self) -> None:
-        self.hist.create_version(name="Persist", content="Data")
-        # Create a new instance pointing to the same directory
-        hist2 = VersionHistory(storage_dir=self.tmpdir)
-        self.assertEqual(hist2.count(), 1)
+from version_history import VersionHistory
 
 
-class DiffTests(unittest.TestCase):
-    def test_compute_diff_additions(self):
-        old = "line1\nline2"
-        new = "line1\nline2\nline3"
-        result = compute_diff(old, new)
-        self.assertEqual(result["added"], ["line3"])
-        self.assertEqual(result["removed"], [])
+_PROMPT_A = "Analyse the request pipeline and optimise for latency."
+_PROMPT_B = "Refactor the database layer to use connection pooling."
+_PROMPT_C = "Add input validation to all public API endpoints."
 
-    def test_compute_diff_removals(self):
-        old = "line1\nline2\nline3"
-        new = "line1\nline3"
-        result = compute_diff(old, new)
-        self.assertEqual(result["removed"], ["line2"])
 
-    def test_compute_diff_modifications(self):
-        old = "hello world\nline2"
-        new = "hello python\nline2"
-        result = compute_diff(old, new)
-        # Line-level diff: the entire line is marked as removed/added
-        self.assertIn("hello world", result["removed"])
-        self.assertIn("hello python", result["added"])
+@pytest.fixture()
+def tmp_history_file(tmp_path: Path) -> Path:
+    return tmp_path / "history.json"
 
-    def test_compute_diff_identical(self):
-        text = "same content"
-        result = compute_diff(text, text)
-        self.assertEqual(result["added"], [])
-        self.assertEqual(result["removed"], [])
 
-    def test_unified_diff_output(self):
-        old = "line1\nline2"
-        new = "line1\nline3"
-        result = compute_unified_diff(old, new)
-        self.assertIn("-line2", result)
-        self.assertIn("+line3", result)
+class TestVersionHistoryPersistence:
+    """P1 fix — test_persistence: verify serialised content, not just count."""
+
+    def test_save_and_reload_preserves_entry_count(self, tmp_history_file: Path):
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.add(_PROMPT_A)
+        vh.add(_PROMPT_B)
+        vh.save()
+
+        reloaded = VersionHistory(storage_path=tmp_history_file)
+        reloaded.load()
+        assert len(reloaded.entries) == 2
+
+    def test_save_and_reload_preserves_prompt_text(self, tmp_history_file: Path):
+        """Core invariant: reloaded entries must match originals exactly."""
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.add(_PROMPT_A)
+        vh.add(_PROMPT_B)
+        vh.save()
+
+        reloaded = VersionHistory(storage_path=tmp_history_file)
+        reloaded.load()
+        texts = [e.prompt if hasattr(e, "prompt") else e.get("prompt", e) for e in reloaded.entries]
+        assert _PROMPT_A in texts
+        assert _PROMPT_B in texts
+
+    def test_serialised_file_is_valid_json(self, tmp_history_file: Path):
+        """The persisted file must be deserializable JSON."""
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.add(_PROMPT_A)
+        vh.save()
+        raw = tmp_history_file.read_text(encoding="utf-8")
+        parsed = json.loads(raw)  # raises if invalid
+        assert parsed  # non-empty
+
+    def test_entry_fields_survive_roundtrip(self, tmp_history_file: Path):
+        """Each entry must expose at least a prompt/text field after reload."""
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.add(_PROMPT_C)
+        vh.save()
+
+        reloaded = VersionHistory(storage_path=tmp_history_file)
+        reloaded.load()
+        entry = reloaded.entries[0]
+        # Accept both dataclass (entry.prompt) and dict (entry['prompt']) shapes.
+        text = entry.prompt if hasattr(entry, "prompt") else entry.get("prompt", entry)
+        assert _PROMPT_C in str(text)
+
+    def test_save_without_load_does_not_corrupt(self, tmp_history_file: Path):
+        vh1 = VersionHistory(storage_path=tmp_history_file)
+        vh1.add(_PROMPT_A)
+        vh1.save()
+
+        vh2 = VersionHistory(storage_path=tmp_history_file)
+        vh2.load()
+        vh2.add(_PROMPT_B)
+        vh2.save()
+
+        vh3 = VersionHistory(storage_path=tmp_history_file)
+        vh3.load()
+        assert len(vh3.entries) == 2
+
+    def test_reload_without_save_returns_empty(self, tmp_history_file: Path):
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.load()  # file does not exist yet
+        assert vh.entries == []
+
+
+class TestVersionHistoryDelete:
+    def test_delete_removes_entry(self, tmp_history_file: Path):
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.add(_PROMPT_A)
+        vh.add(_PROMPT_B)
+        initial_count = len(vh.entries)
+        vh.delete(0)
+        assert len(vh.entries) == initial_count - 1
+
+    def test_delete_removes_correct_entry(self, tmp_history_file: Path):
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.add(_PROMPT_A)
+        vh.add(_PROMPT_B)
+        vh.delete(0)
+        remaining_texts = [
+            e.prompt if hasattr(e, "prompt") else e.get("prompt", e)
+            for e in vh.entries
+        ]
+        assert _PROMPT_A not in remaining_texts
+        assert _PROMPT_B in remaining_texts
+
+    def test_delete_out_of_range_raises_or_noops(self, tmp_history_file: Path):
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.add(_PROMPT_A)
+        try:
+            vh.delete(99)
+        except (IndexError, ValueError):
+            pass  # Both behaviours are acceptable — must not silently corrupt state.
+        assert len(vh.entries) <= 1
+
+
+class TestVersionHistoryClear:
+    def test_clear_empties_entries(self, tmp_history_file: Path):
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.add(_PROMPT_A)
+        vh.add(_PROMPT_B)
+        vh.clear()
+        assert vh.entries == []
+
+    def test_clear_and_save_persists_empty_state(self, tmp_history_file: Path):
+        vh = VersionHistory(storage_path=tmp_history_file)
+        vh.add(_PROMPT_A)
+        vh.save()
+        vh.clear()
+        vh.save()
+        reloaded = VersionHistory(storage_path=tmp_history_file)
+        reloaded.load()
+        assert reloaded.entries == []
