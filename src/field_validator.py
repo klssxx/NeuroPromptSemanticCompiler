@@ -31,15 +31,21 @@ def validate_compile_form(
     variables: dict[str, str] | None = None,
     required_fields: list[str] | None = None,
     strict: bool = False,
+    target: str | None = None,
+    known_targets: set[str] | None = None,
 ) -> FieldValidationResult:
     """Validate a compilation form before processing.
-    
+
     Args:
         prompt: The prompt text to compile.
         variables: If prompt contains {{var}} substitutions, the provided values.
         required_fields: List of field names that must be non-empty.
         strict: If True, warnings become errors.
-    
+        target: Optional target model name to validate.
+        known_targets: Set of valid target names.  When provided and *target* is
+            not None, an unknown target produces a warning (or error in strict
+            mode).  Passing ``known_targets=set()`` disables the check.
+
     Returns:
         FieldValidationResult with errors and warnings.
     """
@@ -47,18 +53,17 @@ def validate_compile_form(
     variables = variables or {}
     required_fields = required_fields or []
 
-    # Check empty prompt
+    # --- empty prompt ---
     if not prompt.strip():
         result.add_error("prompt", "empty_prompt")
         return result  # No point checking further
 
-    # Check for unfilled variables
+    # --- unfilled template variables ---
     from variables import detect_variables, build_fill_form
     detected = detect_variables(prompt)
     if detected:
         form = build_fill_form(prompt)
         unfilled = form.unfilled()
-        filled = [v for v in detected if v not in unfilled]
 
         if unfilled:
             msg = f"unfilled_variables: {', '.join(unfilled)}"
@@ -72,24 +77,31 @@ def validate_compile_form(
         if extra_vars:
             result.add_warning("variables", f"unused_variables: {', '.join(sorted(extra_vars))}")
 
-    # Check required fields
+    # --- required fields (FIX P1: treat empty string as missing) ---
     for req_field in required_fields:
         value = variables.get(req_field, "")
+        # An empty string is just as invalid as a missing key.
         if not value.strip():
             if strict:
                 result.add_error(req_field, f"required_field_empty: {req_field}")
             else:
                 result.add_warning(req_field, f"recommended_field_empty: {req_field}")
 
-    # Check prompt length (warn if very short or very long)
+    # --- target model validation (FIX: implement the placeholder) ---
+    if target is not None and known_targets is not None and len(known_targets) > 0:
+        if target not in known_targets:
+            msg = f"unknown_target: '{target}'. Known targets: {sorted(known_targets)}"
+            if strict:
+                result.add_error("target", msg)
+            else:
+                result.add_warning("target", msg)
+
+    # --- prompt length ---
     prompt_len = len(prompt.strip())
     if prompt_len < 10:
         result.add_warning("prompt", "prompt_too_short")
     elif prompt_len > 50000:
         result.add_warning("prompt", "prompt_very_long")
-
-    # Check if target/model selection is generic
-    # (this would need to be passed in; placeholder for now)
 
     return result
 
@@ -106,8 +118,10 @@ def validate_export_form(
         result.add_error("result", "no_result_to_export")
         return result
 
-    # Check for required result fields
-    if "optimized_prompt" not in result_data and "chosen_nsl" not in result_data:
+    # FIX P1: original bug used AND — both keys had to be absent to trigger the
+    # warning.  The correct invariant is OR: warn when *either* compiled output
+    # key is missing, because a valid export requires at least one of them.
+    if "optimized_prompt" not in result_data or "chosen_nsl" not in result_data:
         result.add_warning("result", "no_compiled_output")
 
     # Validate format support
