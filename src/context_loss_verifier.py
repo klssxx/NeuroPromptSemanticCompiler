@@ -16,7 +16,7 @@ import re
 from typing import Any
 
 from rop_template import validate_rop_text
-from safety_vocabulary import PHRASES, canonical_constraints, contains_constraint
+from safety_vocabulary import PHRASES, canonical_constraints
 
 # Minimum number of goal tokens (len > 3) that must appear in the output
 # for the goal to be considered "preserved".

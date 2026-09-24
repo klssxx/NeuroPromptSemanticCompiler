@@ -8,7 +8,6 @@ never silently overwrite an existing template.
 from __future__ import annotations
 
 import copy
-import json
 import sys
 import os
 import pytest
@@ -69,7 +68,7 @@ class TestTemplateManagerImport:
 
     def test_import_new_template_succeeds(self, manager):
         template = _make_template(name="Imported template")
-        result = manager.import_template(template)
+        manager.import_template(template)
         # import_template may return the assigned id or a bool/dict.
         # Either way, the template must be retrievable afterwards.
         templates = manager.list_templates()
@@ -87,7 +86,7 @@ class TestTemplateManagerImport:
 
         # Step 3: attempt to import — must raise or signal failure.
         try:
-            result = manager.import_template(duplicate)
+            manager.import_template(duplicate)
             # If no exception: the method must signal rejection, not silently accept.
             # We check that the original template is still intact.
             after = manager.get_template(tid)
