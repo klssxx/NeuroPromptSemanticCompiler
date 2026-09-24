@@ -65,3 +65,10 @@ norecursedirs = [
   "__pycache__"
 ]
 python_files = ["test_*.py"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests bootstrap sys.path with the repo's src/ directory BEFORE importing the
+# modules under test; those imports are necessarily not at the top of the file
+# (E402). This is the intentional local-run pattern — CI additionally exports
+# PYTHONPATH=src. No semantic rule (F821/F601/F811/...) is ignored anywhere.
+"tests/**" = ["E402"]
