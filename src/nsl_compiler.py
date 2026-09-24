@@ -58,7 +58,9 @@ def compile_to_nsl(semantics: dict[str, Any], seeds: list[dict[str, Any]], level
     else:
         style = list(dict.fromkeys(style + ["balanced_density"]))
 
-    seed_ids = [seed["id"] for seed in seeds]
+    # Canonical seed shape is a dict with an "id"; tolerate bare strings so a
+    # malformed caller cannot crash the compiler (P2-1 robustness contract).
+    seed_ids = [seed["id"] if isinstance(seed, dict) else str(seed) for seed in seeds]
 
     if level == "aggressive" and semantics.get("semantic_compilation_profile") == "FAST":
         compact_lines = ["NSL/0.1", f"TARGET={target}", f"G={goal}"]

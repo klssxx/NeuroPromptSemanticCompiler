@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import itertools
+
 from datetime import datetime, timezone
 from pathlib import Path
 import re
@@ -22,8 +24,25 @@ def write_text(path: str | Path, text: str) -> None:
     p.write_text(text, encoding="utf-8")
 
 
+_last_run_id_ts = ""
+_run_id_collision_seq = itertools.count(1)
+
+
 def now_run_id(prefix: str = "run") -> str:
-    return f"{prefix}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S_%f')}"
+    """Timestamped id: ``{prefix}_YYYYmmdd_HHMMSS_microseconds``.
+
+    datetime.now() can have coarse resolution on some platforms (notably
+    Windows, ~1 ms), so consecutive calls can land on the exact same
+    timestamp. Callers use these ids as dict keys and file names, so a
+    collision silently OVERWRITES data (e.g. two version saves -> one
+    lost). Same-timestamp calls therefore get a '-n' discriminator.
+    """
+    global _last_run_id_ts
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
+    if ts == _last_run_id_ts:
+        return f"{prefix}_{ts}-{next(_run_id_collision_seq)}"
+    _last_run_id_ts = ts
+    return f"{prefix}_{ts}"
 
 
 def normalize_token(text: str) -> str:
