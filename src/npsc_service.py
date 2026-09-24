@@ -20,7 +20,12 @@ from compilation_profiles import (
 from compiler_defaults import load_compiler_defaults, strict_policy
 from context_loss_verifier import verify_context_loss
 from exporters import export_json, export_text, prepare_output_dir
-from hybrid_output import build_hybrid_output, build_profile_optimized_prompt
+from hybrid_output import (
+    append_four_layers_section,
+    build_four_layer_sections,
+    build_hybrid_output,
+    build_profile_optimized_prompt,
+)
 from model_adapter import adapter_layer, load_model_profiles, select_level
 from nsl_compiler import compile_to_nsl
 from nsl_parser import parse_nsl
@@ -318,10 +323,16 @@ def compile_prompt(request: CompileRequest) -> dict[str, Any]:
         public_hybrid_markdown = hybrid_markdown
         public_semantic_ir = semantic_ir_payload
 
+    # B.4: four-layer separation built from the PUBLIC semantics so raw user
+    # sentences never reach the markdown in hash_only privacy mode.
+    four_layers = build_four_layer_sections(public_semantics, seeds)
+    public_hybrid_markdown = append_four_layers_section(public_hybrid_markdown, four_layers)
+
     return {
         "run_id": run_id,
         "created_at": created_at,
         "quality_report": quality_report,
+        "four_layers": four_layers,
         "prompt_sha256": prompt_hash,
         "original": public_original,
         "privacy_mode": privacy_mode,
@@ -539,6 +550,8 @@ def compile_for_gui(
     hybrid = build_hybrid_output(
         original, profile_status, chosen_nsl, optimized, seeds, profiled_semantics, verifier
     )
+    four_layers = build_four_layer_sections(profiled_semantics, seeds)
+    hybrid = append_four_layers_section(hybrid, four_layers)
 
     return {
         # Audit-trail fields (P1-3)
@@ -550,6 +563,7 @@ def compile_for_gui(
         "strict_failures": strict_failures,
         "token_report": token_report,
         "quality_report": quality_report,
+        "four_layers": four_layers,
         # Core compilation result
         "profile_status": profile_status,
         "semantics": profiled_semantics,

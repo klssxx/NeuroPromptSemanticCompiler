@@ -214,3 +214,113 @@ def build_hybrid_output(
         lines.extend(["", "## RESEARCH_MAX", "Maxima preservacion y validacion estricta activadas."])
 
     return "\n".join(lines).strip() + "\n"
+
+
+# ─── B.4: four-layer content separation ─────────────────────────────────────
+# Hard rule: nothing may cross from "proposals" or "assumptions" into
+# "user requirements" without explicit user confirmation. Profile-injected
+# template content and seed suggestions therefore NEVER appear as
+# requirements, and system inferences are always marked as such.
+
+_INTERNAL_TASK_PREFIXES = ("extract_", "compile_", "verify_", "export_")
+
+
+def build_four_layer_sections(semantics: dict[str, Any], seeds: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Split the compiled semantics into the four B.4 content layers.
+
+    Returns a dict with ``user_requirements``, ``system_assumptions``,
+    ``improvement_proposals`` and ``open_questions``. Purely derived from the
+    IR: no network, no model calls, deterministic.
+    """
+    seeds = seeds or []
+
+    requirements: list[dict[str, str]] = []
+    goal = str(semantics.get("goal") or "").strip()
+    if goal and goal != "compile semantic instruction from prompt":
+        requirements.append({"kind": "goal", "value": goal})
+    for task in semantics.get("tasks") or []:
+        if str(task).startswith(_INTERNAL_TASK_PREFIXES):
+            continue  # compiler-internal vocabulary is not a user requirement
+        requirements.append({"kind": "task", "value": str(task)})
+    for constraint in semantics.get("constraints") or []:
+        requirements.append({"kind": "constraint", "value": str(constraint)})
+    for output in semantics.get("output") or []:
+        requirements.append({"kind": "output", "value": str(output)})
+
+    # Assumptions: exactly what B.2 recorded, origin preserved so the GUI can
+    # require confirmation before any of it becomes a requirement.
+    system_assumptions = [
+        {
+            "field": str(a.get("field", "")),
+            "value": a.get("value"),
+            "confidence": float(a.get("confidence", 0.0)),
+            "origin": str(a.get("origin", "system_inferred")),
+            "reason": str(a.get("reason", "")),
+        }
+        for a in (semantics.get("assumptions") or [])
+    ]
+
+    proposals: list[dict[str, str]] = []
+    for task in semantics.get("profile_template_tasks") or []:
+        proposals.append({"kind": "profile_task", "value": str(task)})
+    for output in semantics.get("profile_template_outputs") or []:
+        proposals.append({"kind": "profile_output", "value": str(output)})
+    for constraint in semantics.get("profile_template_constraints") or []:
+        proposals.append({"kind": "profile_constraint", "value": str(constraint)})
+    for seed in seeds:
+        proposals.append({
+            "kind": "seed",
+            "value": f"{seed.get('id', '')}: {seed.get('name', '')}",
+        })
+
+    open_questions = [str(entry) for entry in (semantics.get("ambiguities") or [])]
+
+    return {
+        "user_requirements": requirements,
+        "system_assumptions": system_assumptions,
+        "improvement_proposals": proposals,
+        "open_questions": open_questions,
+    }
+
+
+_FOUR_LAYER_TITLES = {
+    "user_requirements": "REQUISITOS DEL USUARIO (explícito o inferido con alta confianza)",
+    "system_assumptions": "SUPUESTOS DEL SISTEMA (inferencias del compilador, requieren confirmación)",
+    "improvement_proposals": "PROPUESTAS DE MEJORA (contenido nuevo sugerido, NO dado por el usuario)",
+    "open_questions": "PREGUNTAS ABIERTAS (ambigüedades que el usuario debería resolver)",
+}
+
+
+def render_four_layers(four_layers: dict[str, Any]) -> str:
+    """Render the four layers as markdown sections for the hybrid output."""
+    lines: list[str] = []
+    reqs = four_layers.get("user_requirements") or []
+    lines.append(f"### {_FOUR_LAYER_TITLES['user_requirements']}")
+    lines.extend(f"- [{r['kind']}] {r['value']}" for r in reqs) if reqs else lines.append("- none")
+    lines.append("")
+
+    assumptions = four_layers.get("system_assumptions") or []
+    lines.append(f"### {_FOUR_LAYER_TITLES['system_assumptions']}")
+    if assumptions:
+        lines.extend(
+            f"- {a['field']} = {a['value']!r} (confianza {a['confidence']:.0%}, {a['origin']}) — {a['reason']}"
+            for a in assumptions
+        )
+    else:
+        lines.append("- none")
+    lines.append("")
+
+    proposals = four_layers.get("improvement_proposals") or []
+    lines.append(f"### {_FOUR_LAYER_TITLES['improvement_proposals']}")
+    lines.extend(f"- [{p['kind']}] {p['value']}" for p in proposals) if proposals else lines.append("- none")
+    lines.append("")
+
+    questions = four_layers.get("open_questions") or []
+    lines.append(f"### {_FOUR_LAYER_TITLES['open_questions']}")
+    lines.extend(f"- {q}" for q in questions) if questions else lines.append("- none")
+    return "\n".join(lines).strip()
+
+
+def append_four_layers_section(hybrid_markdown: str, four_layers: dict[str, Any]) -> str:
+    """Append the four-layer separation to a hybrid markdown document."""
+    return hybrid_markdown.rstrip() + "\n\n## Capas de contenido\n\n" + render_four_layers(four_layers) + "\n"
