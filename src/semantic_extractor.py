@@ -289,7 +289,9 @@ _CONTRACTION_PAIRS: list[tuple[tuple[str, ...], tuple[str, ...], str]] = [
     ),
 ]
 
-_ACCEPTANCE_MARKERS = (
+# Public: prompt_quality (B.3) reuses the same acceptance-criteria vocabulary
+# so extraction and evaluation can never drift apart.
+ACCEPTANCE_MARKERS = (
     "criterios de aceptación", "criterio de aceptación", "acceptance criteria",
     "definition of done", "se considera exitoso", "se considera correcto",
     "se considera listo", "como validar", "cómo validar", "cómo verificar",
@@ -347,7 +349,7 @@ def _detect_ambiguities(
             "genérico en lugar de adaptarse a un modelo concreto."
         )
     lowered = text.lower()
-    if not any(marker in lowered for marker in _ACCEPTANCE_MARKERS):
+    if not any(marker in lowered for marker in ACCEPTANCE_MARKERS):
         ambiguities.append(
             "No hay criterios de aceptación: nada en el texto define cómo validar que "
             "el resultado es correcto, así que el éxito quedaría sin verificar."
