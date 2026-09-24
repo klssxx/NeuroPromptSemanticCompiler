@@ -23,7 +23,9 @@ py-modules = [
   "compiler_defaults",
   "constraint_normalizer",
   "context_loss_verifier",
+  "export_manager",
   "exporters",
+  "field_validator",
   "hybrid_output",
   "i18n",
   "model_adapter",
@@ -36,12 +38,16 @@ py-modules = [
   "report_builder",
   "resource_paths",
   "rop_template",
+  "safety_vocabulary",
   "semantic_dictionary",
   "semantic_extractor",
   "semantic_ir",
   "semantic_seed_mapper",
+  "template_manager",
   "token_estimator",
-  "utils"
+  "utils",
+  "variables",
+  "version_history"
 ]
 
 [tool.setuptools.packages.find]
@@ -65,3 +71,10 @@ norecursedirs = [
   "__pycache__"
 ]
 python_files = ["test_*.py"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests bootstrap sys.path with the repo's src/ directory BEFORE importing the
+# modules under test; those imports are necessarily not at the top of the file
+# (E402). This is the intentional local-run pattern — CI additionally exports
+# PYTHONPATH=src. No semantic rule (F821/F601/F811/...) is ignored anywhere.
+"tests/**" = ["E402"]

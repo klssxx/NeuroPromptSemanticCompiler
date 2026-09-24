@@ -1,7 +1,6 @@
 """Tool card — action card with icon placeholder, title, and description."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QFrame, QVBoxLayout
 
 

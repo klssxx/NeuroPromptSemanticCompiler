@@ -6,7 +6,6 @@ can call to add the new functionality.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget
 
 from npsc_gui.about_dialog import AboutDialog

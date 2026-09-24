@@ -1,6 +1,8 @@
 """GUI page for managing reusable prompt templates."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QComboBox, QDialog, QDialogButtonBox, QFormLayout, QHBoxLayout,
@@ -11,6 +13,11 @@ from PySide6.QtWidgets import (
 from i18n import tr
 from template_manager import TemplateManager, PromptTemplate
 from utils import now_run_id
+
+if TYPE_CHECKING:
+    # Imported lazily to avoid a circular import at runtime (main_window
+    # builds this page); the name is only needed for type annotations.
+    from npsc_gui.main_window import MainWindow
 
 
 class TemplateEditorDialog(QDialog):
@@ -273,7 +280,6 @@ def _show_template_detail(parent, item: QListWidgetItem | None, content_preview:
 
 
 def _create_template(parent) -> None:
-    from npsc_gui.main_window import MainWindow
     dlg = TemplateEditorDialog(parent)
     if dlg.exec() != QDialog.Accepted:
         return

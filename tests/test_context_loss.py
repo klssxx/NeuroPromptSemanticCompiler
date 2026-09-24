@@ -19,7 +19,6 @@ class ContextLossTests(unittest.TestCase):
         original = "Necesito una app local sin sudo, sin API, no destructiva."
         semantics = {
             "role": "senior",
-            "goal": "crear app",
             "context": ["local"],
             "tasks": ["compile_nsl"],
             "constraints": ["no_sudo", "no_external_api", "no_destructive_actions"],

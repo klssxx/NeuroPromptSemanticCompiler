@@ -6,8 +6,6 @@ The GUI widget tests are marked as MANUAL_REVIEW_REQUIRED since they need pytest
 from __future__ import annotations
 
 import json
-import tempfile
-from pathlib import Path
 
 
 class TestAdvancedSectionKeys:
@@ -61,7 +59,7 @@ class TestCombinedPrompt:
             "context_role": "Expert Python developer",
             "query_task": "Write a sorting function",
             "specifications": "",
-            "quality_criteria": "", 
+            "quality_criteria": "",
             "output_format": "Python code block",
             "verification": "",
         }

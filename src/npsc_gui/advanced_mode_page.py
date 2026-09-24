@@ -57,7 +57,6 @@ ADVANCED_SECTION_PLACEHOLDERS_ES = {
 
 
 def section_label(key: str) -> str:
-    lang = "es"  # will be overridden by caller using i18n
     defaults = ADVANCED_SECTION_DEFAULTS_ES.get(key, key)
     return defaults
 
@@ -180,7 +179,6 @@ class AdvancedModePage(QWidget):
         sections_layout.setContentsMargins(0, 0, 0, 0)
         sections_layout.setSpacing(8)
 
-        lang = "es"
         defaults = ADVANCED_SECTION_DEFAULTS_ES
         placeholders = ADVANCED_SECTION_PLACEHOLDERS_ES
 

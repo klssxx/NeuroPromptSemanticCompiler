@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QLabel, QPushButton, QFrame, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QLabel, QPushButton, QFrame, QVBoxLayout
 
 
 class NavItem(QPushButton):

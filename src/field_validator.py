@@ -1,3 +1,19 @@
+"""Field validation helpers for NPSC forms.
+
+Changelog
+---------
+P1 fix (item 5)
+    ``validate_compile_form`` now accepts ``target`` and ``known_targets``
+    so callers can validate the target/model selection against the available
+    model profiles.  Both params default to ``None`` for full backward
+    compatibility.
+P2 fix (item 14)
+    ``assert_prompt_not_empty`` provides a service-level guardrail so
+    ``compile_prompt`` / ``compile_for_gui`` cannot silently process an
+    empty or whitespace-only prompt regardless of the caller.
+P2 doc
+    ``validate_export_form`` docstring clarifies the NOR-condition logic.
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -26,20 +42,52 @@ class FieldValidationResult:
         }
 
 
+# ---------------------------------------------------------------------------
+# Service-level guardrail  (P2 fix item 14)
+# ---------------------------------------------------------------------------
+
+def assert_prompt_not_empty(prompt: str) -> None:
+    """Raise ``ValueError`` if *prompt* is empty or whitespace-only.
+
+    Intended to be called at the very top of ``compile_prompt`` and
+    ``compile_for_gui`` in ``npsc_service.py`` so the invariant
+    "prompt must not be empty" is enforced inside the service layer
+    regardless of whether the caller ran ``validate_compile_form`` first.
+
+    Raises:
+        ValueError: with message ``prompt must not be empty or whitespace-only``.
+    """
+    if not prompt or not prompt.strip():
+        raise ValueError("prompt must not be empty or whitespace-only")
+
+
+# ---------------------------------------------------------------------------
+# Form validators
+# ---------------------------------------------------------------------------
+
 def validate_compile_form(
     prompt: str,
     variables: dict[str, str] | None = None,
     required_fields: list[str] | None = None,
     strict: bool = False,
+    target: str | None = None,
+    known_targets: list[str] | None = None,
 ) -> FieldValidationResult:
     """Validate a compilation form before processing.
-    
+
     Args:
         prompt: The prompt text to compile.
         variables: If prompt contains {{var}} substitutions, the provided values.
         required_fields: List of field names that must be non-empty.
         strict: If True, warnings become errors.
-    
+        target: The requested model/target identifier (e.g. ``"codex"``).
+            Pass ``None`` to skip target validation (backward-compatible).
+        known_targets: Exhaustive list of valid target identifiers drawn from
+            ``model_profiles``.  When both *target* and *known_targets* are
+            provided and the target is not in the list, emits an error
+            (strict=True) or warning (strict=False).
+            Pass ``None`` to skip target validation (backward-compatible).
+
     Returns:
         FieldValidationResult with errors and warnings.
     """
@@ -53,12 +101,11 @@ def validate_compile_form(
         return result  # No point checking further
 
     # Check for unfilled variables
-    from variables import detect_variables, build_fill_form
-    detected = detect_variables(prompt)
+    from variables import extract_variables, build_fill_form
+    detected = extract_variables(prompt)
     if detected:
         form = build_fill_form(prompt)
         unfilled = form.unfilled()
-        filled = [v for v in detected if v not in unfilled]
 
         if unfilled:
             msg = f"unfilled_variables: {', '.join(unfilled)}"
@@ -67,10 +114,12 @@ def validate_compile_form(
             else:
                 result.add_warning("variables", msg)
 
-        # Check provided variables vs detected
         extra_vars = set(variables.keys()) - set(detected)
         if extra_vars:
-            result.add_warning("variables", f"unused_variables: {', '.join(sorted(extra_vars))}")
+            result.add_warning(
+                "variables",
+                f"unused_variables: {', '.join(sorted(extra_vars))}",
+            )
 
     # Check required fields
     for req_field in required_fields:
@@ -81,15 +130,24 @@ def validate_compile_form(
             else:
                 result.add_warning(req_field, f"recommended_field_empty: {req_field}")
 
-    # Check prompt length (warn if very short or very long)
+    # Check prompt length
     prompt_len = len(prompt.strip())
     if prompt_len < 10:
         result.add_warning("prompt", "prompt_too_short")
     elif prompt_len > 50000:
         result.add_warning("prompt", "prompt_very_long")
 
-    # Check if target/model selection is generic
-    # (this would need to be passed in; placeholder for now)
+    # P1 fix (item 5): validate target against known model profiles
+    if target is not None and known_targets is not None:
+        if target not in known_targets:
+            msg = (
+                f"unknown_target: '{target}' not in known profiles "
+                f"({', '.join(sorted(known_targets))})"
+            )
+            if strict:
+                result.add_error("target", msg)
+            else:
+                result.add_warning("target", msg)
 
     return result
 
@@ -98,7 +156,20 @@ def validate_export_form(
     result_data: dict[str, Any],
     export_formats: list[str] | None = None,
 ) -> FieldValidationResult:
-    """Validate before exporting a result."""
+    """Validate before exporting a result.
+
+    Emits a ``no_compiled_output`` warning when *neither* ``optimized_prompt``
+    *nor* ``chosen_nsl`` is present in *result_data* (NOR condition — the
+    warning fires only when **both** fields are absent, not when just one is).
+
+    Args:
+        result_data: The compiled result dict to export.
+        export_formats: Requested output formats.  Defaults to
+            ``["markdown", "json", "txt"]``.
+
+    Returns:
+        FieldValidationResult with errors and warnings.
+    """
     result = FieldValidationResult()
     export_formats = export_formats or ["markdown", "json", "txt"]
 
@@ -106,11 +177,10 @@ def validate_export_form(
         result.add_error("result", "no_result_to_export")
         return result
 
-    # Check for required result fields
+    # NOR: warn only when neither compiled-output key is present
     if "optimized_prompt" not in result_data and "chosen_nsl" not in result_data:
         result.add_warning("result", "no_compiled_output")
 
-    # Validate format support
     supported = {"markdown", "json", "txt"}
     unknown = set(export_formats) - supported
     if unknown:

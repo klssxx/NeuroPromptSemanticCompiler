@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QThread, Qt, QUrl, Signal, Slot, QTimer
@@ -10,10 +9,7 @@ from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
     QComboBox,
-    QDialog,
-    QDialogButtonBox,
     QFileDialog,
-    QFormLayout,
     QFrame,
     QGridLayout,
     QHBoxLayout,
@@ -26,7 +22,6 @@ from PySide6.QtWidgets import (
     QPlainTextEdit,
     QProgressBar,
     QPushButton,
-    QSizePolicy,
     QSplitter,
     QStackedWidget,
     QTabWidget,
@@ -42,13 +37,11 @@ from npsc_gui.controller import CompileController
 from npsc_gui.glossary import CATEGORIES, format_entry, get_entry, load_glossary, search_glossary
 from npsc_gui.help_popover import ContextHelpButton, close_context_help_popovers
 from npsc_gui.settings import data_dir, load_settings, reset_settings, save_settings
-from npsc_gui.theme import QSS, get_qss
+from npsc_gui.theme import get_qss
 from npsc_gui.tooltips import apply_tooltip, glossary_term_for, help_text
-from npsc_gui.components.circle_indicator import CircleIndicator
 from npsc_gui.components.scan_ring import ScanRing
 from npsc_gui.components.health_dashboard import HealthDashboard
 from npsc_gui.components.status_chip import StatusChip
-from npsc_gui.components.result_card import ResultCard
 from npsc_gui.components.tool_card import ToolCard
 from npsc_gui.components.nav_group import NavGroup, NavItem
 from npsc_gui.template_page import build_template_page
@@ -57,7 +50,7 @@ from npsc_gui.advanced_mode_page import AdvancedModePage
 from npsc_gui.about_dialog import AboutDialog
 from npsc_gui.export_preview import ExportPreviewDialog
 from token_estimator import estimate_counters
-from variables import detect_variables, fill_variables
+from variables import extract_variables, fill_variables
 from field_validator import validate_compile_form
 from version_history import VersionHistory
 from template_manager import TemplateManager
@@ -634,7 +627,7 @@ class MainWindow(QMainWindow):
         layout.setSpacing(8)
         self.status_dot = QLabel()
         self.status_dot.setFixedSize(6, 6)
-        self.status_dot.setStyleSheet(f"background: #30B87A; border-radius: 3px;")
+        self.status_dot.setStyleSheet("background: #30B87A; border-radius: 3px;")
         self.status_label = QLabel("Preparado")
         self.status_label.setObjectName("Muted")
         self.status_profile = QLabel("Perfil: AUTO")
@@ -1682,7 +1675,7 @@ class MainWindow(QMainWindow):
             return
 
         # ── Variable detection and substitution ──
-        detected_vars = detect_variables(prompt)
+        detected_vars = extract_variables(prompt)
         if detected_vars:
             unfilled = [v for v in detected_vars if not self._variable_values.get(v, "").strip()]
             if unfilled:
@@ -1692,7 +1685,7 @@ class MainWindow(QMainWindow):
                     "Usa Editar → Rellenar variables o completa las variables antes de compilar."
                 )
                 return
-            prompt = fill_variables(prompt, self._variable_values, strict=False)
+            prompt, _unfilled = fill_variables(prompt, self._variable_values, strict=False)
 
         # ── Pre-compilation validation ──
         validation = validate_compile_form(
@@ -2234,7 +2227,7 @@ class MainWindow(QMainWindow):
         from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit
 
         prompt = self._get_current_prompt()
-        vars_found = detect_variables(prompt)
+        vars_found = extract_variables(prompt)
         if not vars_found:
             QMessageBox.information(self, "Variables", "No se detectaron variables {{variable}} en el prompt actual.")
             return

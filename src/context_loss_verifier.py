@@ -1,9 +1,26 @@
+"""Context-loss verifier for the NeuroPromptSemanticCompiler pipeline.
+
+Changes vs previous version
+---------------------------
+* P0 fix: safety phrase detection now imports from ``safety_vocabulary``
+  (single source of truth); removed the independent hard-coded dict.
+* P1 fix: goal verification uses token-overlap (≥ MIN_GOAL_TOKENS tokens of
+  length > 3) instead of a 20-char prefix match.
+* P1 fix: safety constraints evaluated against the *complete* post-profile
+  ``semantics['constraints']`` list, not just against the original text.
+  Profile-injected constraints (CRITICAL_CONSTRAINTS) are now visible.
+"""
 from __future__ import annotations
 
 import re
 from typing import Any
 
 from rop_template import validate_rop_text
+from safety_vocabulary import PHRASES, canonical_constraints
+
+# Minimum number of goal tokens (len > 3) that must appear in the output
+# for the goal to be considered "preserved".
+MIN_GOAL_TOKENS = 2
 
 
 INTERNAL_TERMS = {
@@ -46,6 +63,44 @@ def _unsupported_additions(original: str, output: str, allowed_terms: set[str]) 
     return additions[:80]
 
 
+def _goal_preserved(goal_value: Any, reconstructed_lower: str) -> bool:
+    """Return True if ≥ MIN_GOAL_TOKENS tokens from *goal_value* appear in output.
+
+    Falls back to False (not 'trivially True') when goal is empty so callers
+    can flag the field as missing rather than silently passing.
+    """
+    if not goal_value:
+        return False
+    goal_tokens = [
+        t for t in re.findall(r"\w+", str(goal_value).lower(), flags=re.UNICODE)
+        if len(t) > 3
+    ]
+    if not goal_tokens:
+        return False
+    matched = sum(1 for tok in goal_tokens if tok in reconstructed_lower)
+    return matched >= MIN_GOAL_TOKENS
+
+
+def _safety_constraints_to_check(
+    original: str,
+    semantics: dict[str, Any],
+) -> set[str]:
+    """Union of safety constraints detected in *original* text and those
+    injected by the profile into ``semantics['constraints']``.
+
+    This ensures profile-injected CRITICAL_CONSTRAINTS are visible to the
+    verifier even when they were not present in the original prompt.
+    """
+    # Detected from original text via unified vocabulary
+    from_text: set[str] = set(canonical_constraints(original))
+    # Declared in semantics (may include profile-injected keys)
+    from_semantics: set[str] = set(
+        c for c in (semantics.get("constraints") or [])
+        if c in PHRASES
+    )
+    return from_text | from_semantics
+
+
 def verify_context_loss(
     original: str,
     semantics: dict[str, Any],
@@ -74,7 +129,7 @@ def verify_context_loss(
     profile_failures: list[str] = []
     preserved_fields: list[str] = []
     missing_fields: list[str] = []
-    score = 100
+    _deductions = 0  # renamed from 'score' accumulator to avoid confusion
 
     nsl_lower = nsl_text.lower()
     rec_lower = reconstructed.lower()
@@ -84,30 +139,35 @@ def verify_context_loss(
     nsl_words = _word_count(nsl_text)
     reconstructed_words = _word_count(reconstructed)
 
-    if fields["goal"] and str(fields["goal"]).lower()[:20] in rec_lower:
+    # ------------------------------------------------------------------
+    # P1 fix: goal verified by token overlap, not 20-char prefix
+    # ------------------------------------------------------------------
+    if _goal_preserved(fields["goal"], rec_lower):
         preserved_fields.append("goal")
         objective_preservation = "preserved"
     else:
         missing_fields.append("goal")
         critical_losses.append("missing_goal")
-        score -= 30
+        _deductions += 30
         objective_preservation = "missing"
 
-    safety_phrases = {
-        "no_sudo": ["no_sudo", "sin sudo", "no sudo"],
-        "no_external_api": ["no_external_api", "sin api", "no api", "no external api"],
-        "no_destructive_actions": ["no_destructive_actions", "nada destructivo", "no destructive"],
-        "stay_inside_project_root": ["stay_inside_project_root", "stay inside", "no tocar fuera"],
-    }
+    # ------------------------------------------------------------------
+    # P0 fix: safety phrases from safety_vocabulary (single source of truth)
+    # P1 fix: check both original text AND semantics['constraints'] (post-profile)
+    # ------------------------------------------------------------------
+    active_safety_keys = _safety_constraints_to_check(original, semantics)
 
-    for label, phrases in safety_phrases.items():
-        if _contains_any(original, phrases):
-            if _contains_any(nsl_lower, [label]) or _contains_any(rec_lower, phrases):
-                preserved_fields.append(label)
-            else:
-                missing_fields.append(label)
-                critical_losses.append(f"missing_{label}")
-                score -= 25
+    for label in PHRASES:  # iterate canonical keys in defined order
+        if label not in active_safety_keys:
+            continue
+        phrases = PHRASES[label]
+        # Preserved if canonical key appears in NSL OR any phrase appears in output
+        if _contains_any(nsl_lower, [label]) or _contains_any(rec_lower, phrases):
+            preserved_fields.append(label)
+        else:
+            missing_fields.append(label)
+            critical_losses.append(f"missing_{label}")
+            _deductions += 25
 
     for field_name in ["context", "tasks", "constraints", "priorities", "tools", "output", "style", "risks", "target"]:
         value = fields.get(field_name)
@@ -123,14 +183,17 @@ def verify_context_loss(
             preserved_fields.append(field_name)
         elif tokens:
             missing_fields.append(field_name)
-            score -= 6
+            _deductions += 6
             warnings.append(f"weak_{field_name}_preservation")
 
     if "output" in missing_fields:
         warnings.append("missing_output_contract")
-        score -= 10
+        _deductions += 10
 
-    critical_present = [item for item in ["no_sudo", "no_external_api", "no_destructive_actions", "stay_inside_project_root"] if item in preserved_fields]
+    critical_present = [
+        item for item in PHRASES
+        if item in preserved_fields
+    ]
     role_preservation = "preserved" if fields.get("role") and str(fields.get("role")).lower()[:8] in combined_lower else "weak"
     context_preservation = "preserved" if "context" in preserved_fields else ("not_applicable" if not fields.get("context") else "weak")
     deliverable_preservation = "preserved" if "output" in preserved_fields else ("not_applicable" if not fields.get("output") else "weak")
@@ -160,7 +223,7 @@ def verify_context_loss(
     user_constraints = set(fields.get("constraints") or [])
     traced_constraints = set(critical_present) | {c for c in user_constraints if c.lower() in combined_lower}
     constraint_traceability_score = int(100 * len(traced_constraints) / max(1, len(user_constraints))) if user_constraints else 100
-    retention_score = score
+    retention_score = max(0, 100 - _deductions)
     precision_score = max(0, 100 - unsupported_addition_score - contradiction_score)
     utility_score = max(0, min(100, int((retention_score * 0.5) + (precision_score * 0.3) + (constraint_traceability_score * 0.2))))
     risk_score = min(100, unsupported_addition_score + contradiction_score + max(0, 100 - retention_score))
@@ -189,7 +252,7 @@ def verify_context_loss(
         warnings.append(f"fast_nsl_schema_overhead_for_short_prompt:{nsl_size_ratio}")
     if expansion_ratio_execution_prompt > 4.0 and profile_upper not in {"ROP", "RESEARCH_MAX"}:
         warnings.append(f"execution_prompt_expansion_high:{expansion_ratio_execution_prompt}")
-    if score >= 90 and precision_score < 70 and not permitted_profile_expansion:
+    if retention_score >= 90 and precision_score < 70 and not permitted_profile_expansion:
         warnings.append("high_retention_but_low_precision")
 
     validation = (profile or {}).get("validation", {})
@@ -197,28 +260,28 @@ def verify_context_loss(
     if profile_upper == "FAST":
         if critical_losses:
             profile_failures.append("fast_critical_loss")
-        elif score < min_score:
-            warnings.append(f"fast_low_score:{score}<{min_score}")
+        elif retention_score < min_score:
+            warnings.append(f"fast_low_score:{retention_score}<{min_score}")
     elif profile_upper == "STANDARD":
         if critical_losses:
             profile_failures.append("standard_critical_loss")
-        if score < min_score:
-            warnings.append(f"standard_low_score:{score}<{min_score}")
+        if retention_score < min_score:
+            warnings.append(f"standard_low_score:{retention_score}<{min_score}")
     elif profile_upper == "ADVANCED":
         required = {"goal", "constraints", "output"}
         for field in sorted(required.intersection(set(missing_fields))):
             profile_failures.append(f"advanced_missing_{field}")
         if critical_losses:
             profile_failures.append("advanced_critical_loss")
-        if score < min_score:
-            profile_failures.append(f"advanced_score_below_min:{score}<{min_score}")
+        if retention_score < min_score:
+            profile_failures.append(f"advanced_score_below_min:{retention_score}<{min_score}")
     elif profile_upper == "ROP":
         for missing in validate_rop_text(reconstructed):
             profile_failures.append(f"rop_missing_{missing.lower()}")
         if critical_losses:
             profile_failures.append("rop_critical_loss")
-        if score < min_score:
-            profile_failures.append(f"rop_score_below_min:{score}<{min_score}")
+        if retention_score < min_score:
+            profile_failures.append(f"rop_score_below_min:{retention_score}<{min_score}")
     elif profile_upper == "RESEARCH_MAX":
         strict_required = {"goal", "context", "tasks", "constraints", "output", "risks"}
         for field in sorted(strict_required.intersection(set(missing_fields))):
@@ -228,10 +291,15 @@ def verify_context_loss(
         blocking_warnings = [warning for warning in warnings if warning != "deliberate_profile_expansion"]
         if blocking_warnings:
             profile_failures.append("research_max_warnings_present")
-        if score < min_score:
-            profile_failures.append(f"research_max_score_below_min:{score}<{min_score}")
+        if retention_score < min_score:
+            profile_failures.append(f"research_max_score_below_min:{retention_score}<{min_score}")
 
-    score = max(0, min(100, int((retention_score * 0.55) + (precision_score * 0.25) + (constraint_traceability_score * 0.20) - (contradiction_score * 0.25))))
+    score = max(0, min(100, int(
+        (retention_score * 0.55)
+        + (precision_score * 0.25)
+        + (constraint_traceability_score * 0.20)
+        - (contradiction_score * 0.25)
+    )))
 
     if critical_losses:
         recommendation = "safe"
@@ -254,7 +322,10 @@ def verify_context_loss(
         "missing_fields": sorted(set(missing_fields)),
         "recommendation": recommendation,
         "objective_preservation": objective_preservation,
-        "critical_constraint_preservation": "preserved" if not any(item.startswith("missing_no_") or item.startswith("missing_stay_") for item in critical_losses) else "missing",
+        "critical_constraint_preservation": "preserved" if not any(
+            item.startswith("missing_no_") or item.startswith("missing_stay_") or item.startswith("missing_offline_")
+            for item in critical_losses
+        ) else "missing",
         "deliverable_preservation": deliverable_preservation,
         "output_schema_preservation": output_schema_preservation,
         "role_preservation": role_preservation,

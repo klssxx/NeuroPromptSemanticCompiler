@@ -1,3 +1,13 @@
+"""Semantic extractor for the NeuroPromptSemanticCompiler pipeline.
+
+Changes vs previous version
+---------------------------
+* P0 fix: safety constraint detection now delegates to ``safety_vocabulary``
+  (``canonical_constraints``) instead of duplicating phrase lists.
+* P1 fix: corrected three dead-code regexes in ``_extract_constraints`` that
+  used double-escaped ``\\\\s+`` (raw-string error).  The equivalent coverage
+  is now provided by the unified vocabulary, so the dead branches are removed.
+"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -8,6 +18,7 @@ from typing import Any
 from utils import unique_preserve
 from constraint_normalizer import normalize_constraints
 from resource_paths import resource_path
+from safety_vocabulary import canonical_constraints as _safety_canonical
 
 
 PATTERN_PATH = resource_path("configs/extraction_patterns.json")
@@ -91,25 +102,24 @@ def _extract_tasks(text: str, patterns: dict[str, Any]) -> list[str]:
         ("translate_text", [r"\btraduce\b", r"\btraducir\b", r"\btranslate\b"]),
         ("write_email", [r"\bcorreo\b", r"\bemail\b", r"\be-mail\b"]),
         ("summarize_text", [r"\bresume\b", r"\bresumir\b", r"\bsummarize\b"]),
-        ("analyze_code", [r"\bc[oó]digo\b", r"\bcode\b", r"\bdebug\b", r"\berror\b"]),
+        ("analyze_code", [r"\bc[o\u00f3]digo\b", r"\bcode\b", r"\bdebug\b", r"\berror\b"]),
         ("design_architecture", [r"\barquitectura\b", r"\barchitecture\b"]),
-        ("build_application", [r"\bapp\b", r"\baplicaci[oó]n\b", r"\btool\b", r"\bherramienta\b"]),
+        ("build_application", [r"\bapp\b", r"\baplicaci[o\u00f3]n\b", r"\btool\b", r"\bherramienta\b"]),
         ("create_tests", [r"\btests?\b", r"\bpruebas?\b", r"\bunittest\b", r"\bpytest\b"]),
         ("evaluate_strategy", [r"\bestrategia\b", r"\bstrategy\b", r"\bmonetiz", r"\bcompar"]),
-        ("research_topic", [r"\binvestiga", r"\binvestigaci[oó]n\b", r"\bresearch\b"]),
+        ("research_topic", [r"\binvestiga", r"\binvestigaci[o\u00f3]n\b", r"\bresearch\b"]),
         ("optimize_prompt", [r"\bprompt\b", r"\boptimiza\b", r"\boptimizar\b"]),
     ]
     for label, regexes in task_patterns:
         if any(re.search(regex, lowered) for regex in regexes):
             tasks.append(label)
 
-    # Detect explicit requests for NPSC-like internals only when the user names them.
     explicit_internal = {
-        "extract_semantics": ["extract_semantics", "extrae semantica", "extrae semántica"],
+        "extract_semantics": ["extract_semantics", "extrae semantica", "extrae sem\u00e1ntica"],
         "map_seeds": ["map_seeds", "mapear seeds", "semantic seeds"],
         "compile_nsl": ["compile_nsl", "compilar nsl", "nsl"],
         "reconstruct_prompt": ["reconstruct_prompt", "reconstruir prompt"],
-        "verify_context_loss": ["verify_context_loss", "pérdida de contexto", "perdida de contexto"],
+        "verify_context_loss": ["verify_context_loss", "p\u00e9rdida de contexto", "perdida de contexto"],
         "export_reports": ["export_reports", "exportar reportes", "exportar informes"],
     }
     for label, markers in explicit_internal.items():
@@ -122,39 +132,37 @@ def _extract_tasks(text: str, patterns: dict[str, Any]) -> list[str]:
 
 
 def _extract_constraints(text: str, patterns: dict[str, Any]) -> list[str]:
+    """Detect safety/operational constraints in *text*.
+
+    Primary detection is now delegated to ``safety_vocabulary.canonical_constraints``
+    which uses the unified PHRASES dict as a single source of truth.
+
+    The ``safety_map`` in *patterns* is kept as a supplementary path for any
+    project-specific markers not yet in the central vocabulary.
+    Additional implicit pairs are preserved for non-safety operational
+    constraints (ubuntu, local, offline aliases).
+    """
     lowered = text.lower()
-    safety_map = patterns.get("safety_map", {})
     detected: list[str] = []
+
+    # --- Primary: unified vocabulary (P0 fix) ---
+    detected.extend(_safety_canonical(text))
+
+    # --- Supplementary: project-specific safety_map from patterns JSON ---
+    safety_map = patterns.get("safety_map", {})
     for label, markers in safety_map.items():
-        if any(marker.lower() in lowered for marker in markers):
+        if label not in detected and any(marker.lower() in lowered for marker in markers):
             detected.append(label)
-    # Implicit constraints
+
+    # --- Implicit operational constraints (non-safety) ---
     implicit_pairs = {
         "ubuntu": "ubuntu_environment",
         "local": "local_first",
-        "offline": "offline_only",
-        "sin internet": "offline_only",
-        "no internet": "offline_only",
     }
     for needle, label in implicit_pairs.items():
-        if needle in lowered:
+        if needle in lowered and label not in detected:
             detected.append(label)
-    if re.search(r"(sin|no)\\s+tocar\\s+fuera\\s+del\\s+proyecto", lowered):
-        detected.append("stay_inside_project_root")
-    if re.search(r"fuera\\s+del\\s+proyecto", lowered):
-        detected.append("stay_inside_project_root")
-    if re.search(r"(inside|within)\\s+(the\\s+)?(project\\s+)?root", lowered):
-        detected.append("stay_inside_project_root")
-    if "dentro del proyecto" in lowered:
-        detected.append("stay_inside_project_root")
-    if "no uses sudo" in lowered or "no use sudo" in lowered or "no usar sudo" in lowered:
-        detected.append("no_sudo")
-    if "sin api" in lowered or "no uses api" in lowered or "no usar api" in lowered:
-        detected.append("no_external_api")
-    if "no destructiva" in lowered or "no destructivo" in lowered or "no destructivas" in lowered:
-        detected.append("no_destructive_actions")
-    if "no destruir" in lowered or "nada destructivo" in lowered:
-        detected.append("no_destructive_actions")
+
     return unique_preserve(normalize_constraints(detected))
 
 
@@ -162,11 +170,11 @@ def _extract_priorities(text: str) -> list[str]:
     lowered = text.lower()
     candidates = [
         ("safety", ["safety", "seguridad", "safe"]),
-        ("semantic_preservation", ["preserve", "preserv", "intención", "meaning"]),
+        ("semantic_preservation", ["preserve", "preserv", "intenci\u00f3n", "meaning"]),
         ("clarity", ["clarity", "claro", "readable"]),
         ("compression", ["compact", "compression", "comprimir"]),
         ("extensibility", ["extensible", "extensibility", "future"]),
-        ("speed", ["fast", "speed", "rápido"]),
+        ("speed", ["fast", "speed", "r\u00e1pido"]),
     ]
     ranked = [name for name, needles in candidates if any(n in lowered for n in needles)]
     if not ranked:
@@ -200,7 +208,7 @@ def _extract_output(text: str) -> list[str]:
         ("translated_text", [r"\btraduce\b", r"\btranslate\b"]),
         ("email_draft", [r"\bcorreo\b", r"\bemail\b"]),
         ("summary", [r"\bresumen\b", r"\bresume\b", r"\bsummar"]),
-        ("code_review", [r"\bc[oó]digo\b", r"\bcode\b", r"\berror\b"]),
+        ("code_review", [r"\bc[o\u00f3]digo\b", r"\bcode\b", r"\berror\b"]),
         ("architecture_proposal", [r"\barquitectura\b", r"\barchitecture\b"]),
         ("tests", [r"\btests?\b", r"\bpruebas?\b"]),
         ("risk_analysis", [r"\briesgos?\b", r"\brisks?\b"]),
@@ -209,7 +217,7 @@ def _extract_output(text: str) -> list[str]:
         ("json", [r"\bjson\b"]),
         ("nsl", [r"\bnsl\b"]),
         ("files", [r"\barchivos?\b", r"\bfiles?\b"]),
-        ("docs", [r"\bdocs?\b", r"\bdocumentaci[oó]n\b"]),
+        ("docs", [r"\bdocs?\b", r"\bdocumentaci[o\u00f3]n\b"]),
     ]
     outputs = [label for label, regexes in mapping if any(re.search(regex, lowered) for regex in regexes)]
     if not outputs:
@@ -254,50 +262,24 @@ def extract_semantics(text: str) -> dict[str, Any]:
     constraints = _extract_constraints(text, patterns)
     priorities = _extract_priorities(text)
     tools = _extract_tools(text)
-    outputs = _extract_output(text)
+    output = _extract_output(text)
     style = _extract_style(text)
     risks = _extract_risks(text)
-
-    fragments = {
-        "goal_sentence": goal,
-        "has_no_sudo": "no_sudo" in constraints,
-        "has_no_external_api": "no_external_api" in constraints,
-        "has_no_destructive": "no_destructive_actions" in constraints,
-        "has_scope_limit": "stay_inside_project_root" in constraints,
-    }
-
-    context_items = []
-    lowered = text.lower()
-    if "ubuntu" in lowered:
-        context_items.append("ubuntu")
-    if "python" in lowered:
-        context_items.append("python3.10+")
-    if "local" in lowered:
-        context_items.append("local_first")
-    if "offline" in lowered or "sin internet" in lowered or "no internet" in lowered:
-        context_items.append("offline")
-    if "codex" in lowered:
-        context_items.append("codex")
-    if "hermes" in lowered:
-        context_items.append("hermes")
-    if "gpt" in lowered:
-        context_items.append("gpt")
-
     return {
+        "language": language,
+        "target": target,
         "role": role,
         "goal": goal,
-        "context": unique_preserve(context_items),
         "tasks": tasks,
         "constraints": constraints,
         "priorities": priorities,
         "tools": tools,
-        "input": "messy_human_prompt",
-        "output": outputs,
+        "output": output,
         "style": style,
         "risks": risks,
-        "target": target,
-        "safety_constraints": [c for c in constraints if c in {"no_sudo", "no_external_api", "no_destructive_actions", "stay_inside_project_root"}],
-        "language": language,
-        "original_fragments": fragments,
-        "original_text": text,
+        "context": None,
+        "safety_constraints": [c for c in constraints if c in [
+            "no_sudo", "no_external_api", "no_destructive_actions",
+            "stay_inside_project_root", "offline_only",
+        ]],
     }

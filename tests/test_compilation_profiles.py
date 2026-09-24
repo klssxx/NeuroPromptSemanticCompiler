@@ -22,7 +22,6 @@ from constraint_normalizer import normalize_constraints
 from rop_template import REQUIRED_ROP_SECTIONS
 from semantic_dictionary import validate_semantic_dictionary
 from semantic_extractor import extract_semantics
-from npsc_service import CompileRequest, compile_prompt
 
 
 class CompilationProfileTests(unittest.TestCase):
