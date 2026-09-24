@@ -40,7 +40,9 @@ class TestCompilePromptEmptyGuard:
     def test_valid_prompt_does_not_raise(self):
         req = CompileRequest(original=_VALID_PROMPT, target=_VALID_TARGET, profile=_VALID_PROFILE)
         result = compile_prompt(req)
-        assert result["run_id"].startswith("npsc-")
+        # utils.now_run_id joins prefix and timestamp with '_' (compile_prompt
+        # uses prefix "npsc"); only compile_for_gui embeds a dash ("npsc-gui").
+        assert result["run_id"].startswith("npsc_")
 
 
 # ---------------------------------------------------------------------------
