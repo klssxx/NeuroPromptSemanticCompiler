@@ -65,7 +65,7 @@ def build_semantic_ir(
         "semantic_ir": {
             "role": semantics.get("role", ""),
             "objectives": [semantics.get("goal", "")] if semantics.get("goal") else [],
-            "context": list(semantics.get("context", [])),
+            "context": list(semantics.get("context") or []),
             "constraints": constraints,
             "critical_constraints": critical_constraints(constraints),
             "deliverables": list(semantics.get("output", [])),
@@ -82,7 +82,7 @@ def build_semantic_ir(
             "tasks": origin_items(list(semantics.get("tasks", [])), "user_inferred", "USER_INTENT_IR"),
             "deliverables": origin_items(list(semantics.get("output", [])), "user_inferred", "USER_INTENT_IR"),
             "user_constraints": origin_items(constraints, "user_explicit", "USER_INTENT_IR"),
-            "context": origin_items(list(semantics.get("context", [])), "user_inferred", "USER_INTENT_IR"),
+            "context": origin_items(list(semantics.get("context") or []), "user_inferred", "USER_INTENT_IR"),
         },
         "compiler_trace": compiler_trace or {},
         "policy_layer": policy_layer or {"policy_constraints": [], "origin": "product_policy"},
