@@ -59,10 +59,21 @@ class TestNslCompilerRobustness:
         assert isinstance(result, str)
 
     def test_conflicting_levels_are_deterministic(self):
-        """Calling compile_to_nsl twice with the same args must return identical output."""
+        """Calling compile_to_nsl twice with the same args must return identical output.
+
+        The ID= line carries a per-invocation run id (utils.now_run_id), which
+        is trace metadata, not compilation semantics — on any clock with real
+        microsecond resolution two calls produce different ids by design.
+        Determinism is asserted over everything EXCEPT that trace line.
+        """
+        def without_run_id(nsl: str) -> str:
+            return "\n".join(line for line in nsl.splitlines() if not line.startswith("ID="))
+
         r1 = compile_to_nsl(_NORMAL_SEMANTICS, _SEEDS, level="safe", target="codex")
         r2 = compile_to_nsl(_NORMAL_SEMANTICS, _SEEDS, level="safe", target="codex")
-        assert r1 == r2, "compile_to_nsl is not deterministic for the same inputs."
+        assert without_run_id(r1) == without_run_id(r2), (
+            "compile_to_nsl is not deterministic for the same inputs (ignoring the ID= trace line)."
+        )
 
     def test_unknown_target_does_not_raise(self):
         """An unknown target value must not cause a KeyError or unhandled exception."""

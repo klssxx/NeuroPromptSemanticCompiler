@@ -83,7 +83,9 @@ class TestCompileForGuiAuditTrail:
 
     def test_run_id_present_and_prefixed(self):
         assert "run_id" in self.result
-        assert self.result["run_id"].startswith("npsc-gui-")
+        # compile_for_gui uses prefix "npsc-gui"; now_run_id joins the
+        # timestamp with '_' (a '-n' discriminator only on clock collisions).
+        assert self.result["run_id"].startswith("npsc-gui_")
 
     def test_created_at_present_and_iso(self):
         assert "created_at" in self.result
@@ -109,5 +111,8 @@ class TestCompileForGuiAuditTrail:
     def test_token_report_present_and_has_keys(self):
         tr = self.result.get("token_report")
         assert isinstance(tr, dict)
-        # token_report must contain at least one level key.
-        assert any(k in tr for k in ("safe", "balanced", "aggressive", "optimized"))
+        # build_token_report emits one estimate block per level (suffixed
+        # *_nsl / optimized_prompt) plus the original baseline.
+        for key in ("original", "safe_nsl", "balanced_nsl", "aggressive_nsl", "optimized_prompt"):
+            assert key in tr, f"token_report missing '{key}'"
+        assert "approx_tokens" in tr["balanced_nsl"]
