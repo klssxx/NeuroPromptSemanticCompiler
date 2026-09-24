@@ -107,7 +107,7 @@ class TestVersionHistoryRoundTrip:
 
     def test_id_and_timestamp_stable_across_reload(self, tmp_path):
         h1 = VersionHistory(storage_dir=tmp_path)
-        ver = h1.create_version(name="stable", content="stable body")
+        h1.create_version(name="stable", content="stable body")
         v1 = h1.list_all()[0]
 
         h2 = VersionHistory(storage_dir=tmp_path)
