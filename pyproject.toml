@@ -34,6 +34,7 @@ py-modules = [
   "nsl_compiler",
   "nsl_parser",
   "profile_selector",
+  "prompt_quality",
   "prompt_reconstructor",
   "report_builder",
   "resource_paths",

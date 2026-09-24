@@ -25,6 +25,7 @@ from model_adapter import adapter_layer, load_model_profiles, select_level
 from nsl_compiler import compile_to_nsl
 from nsl_parser import parse_nsl
 from profile_selector import auto_select_profile
+from prompt_quality import evaluate_quality
 from rop_template import rop_payload
 from semantic_ir import build_semantic_ir
 from prompt_reconstructor import reconstruct_prompt
@@ -240,6 +241,7 @@ def compile_prompt(request: CompileRequest) -> dict[str, Any]:
     verifier["strict_status"] = "pass" if strict_passed else "blocked"
     verifier["strict_failures"] = strict_reasons
     token_report = build_token_report(original, safe_nsl, balanced_nsl, aggressive_nsl, optimized_prompt)
+    quality_report = evaluate_quality(original, profiled_semantics, optimized_prompt).to_dict()
     hybrid_markdown = build_hybrid_output(render_original, profile_status, chosen_nsl, optimized_prompt, seeds, profiled_semantics, verifier, privacy_mode=privacy_mode)
     run_id = now_run_id("npsc")
     created_at = datetime.now(timezone.utc).isoformat()
@@ -319,6 +321,7 @@ def compile_prompt(request: CompileRequest) -> dict[str, Any]:
     return {
         "run_id": run_id,
         "created_at": created_at,
+        "quality_report": quality_report,
         "prompt_sha256": prompt_hash,
         "original": public_original,
         "privacy_mode": privacy_mode,
@@ -529,6 +532,7 @@ def compile_for_gui(
 
     # P1-3: token report, run_id and created_at for audit-trail parity.
     token_report = build_token_report(original, safe_nsl, balanced_nsl, aggressive_nsl, optimized)
+    quality_report = evaluate_quality(original, profiled_semantics, optimized).to_dict()
     run_id = now_run_id("npsc-gui")
     created_at = datetime.now(timezone.utc).isoformat()
 
@@ -545,6 +549,7 @@ def compile_for_gui(
         "strict_passed": strict_passed,
         "strict_failures": strict_failures,
         "token_report": token_report,
+        "quality_report": quality_report,
         # Core compilation result
         "profile_status": profile_status,
         "semantics": profiled_semantics,
