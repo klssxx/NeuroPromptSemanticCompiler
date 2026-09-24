@@ -173,7 +173,7 @@ class VersionHistory:
 
 def compute_diff(old_text: str, new_text: str) -> dict[str, Any]:
     """Compute a readable diff between two texts.
-    
+
     Returns:
         {
             "added": list[str],       # lines added

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QThread, Qt, QUrl, Signal, Slot, QTimer
@@ -10,10 +9,7 @@ from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
     QComboBox,
-    QDialog,
-    QDialogButtonBox,
     QFileDialog,
-    QFormLayout,
     QFrame,
     QGridLayout,
     QHBoxLayout,
@@ -26,7 +22,6 @@ from PySide6.QtWidgets import (
     QPlainTextEdit,
     QProgressBar,
     QPushButton,
-    QSizePolicy,
     QSplitter,
     QStackedWidget,
     QTabWidget,
@@ -42,13 +37,11 @@ from npsc_gui.controller import CompileController
 from npsc_gui.glossary import CATEGORIES, format_entry, get_entry, load_glossary, search_glossary
 from npsc_gui.help_popover import ContextHelpButton, close_context_help_popovers
 from npsc_gui.settings import data_dir, load_settings, reset_settings, save_settings
-from npsc_gui.theme import QSS, get_qss
+from npsc_gui.theme import get_qss
 from npsc_gui.tooltips import apply_tooltip, glossary_term_for, help_text
-from npsc_gui.components.circle_indicator import CircleIndicator
 from npsc_gui.components.scan_ring import ScanRing
 from npsc_gui.components.health_dashboard import HealthDashboard
 from npsc_gui.components.status_chip import StatusChip
-from npsc_gui.components.result_card import ResultCard
 from npsc_gui.components.tool_card import ToolCard
 from npsc_gui.components.nav_group import NavGroup, NavItem
 from npsc_gui.template_page import build_template_page
@@ -634,7 +627,7 @@ class MainWindow(QMainWindow):
         layout.setSpacing(8)
         self.status_dot = QLabel()
         self.status_dot.setFixedSize(6, 6)
-        self.status_dot.setStyleSheet(f"background: #30B87A; border-radius: 3px;")
+        self.status_dot.setStyleSheet("background: #30B87A; border-radius: 3px;")
         self.status_label = QLabel("Preparado")
         self.status_label.setObjectName("Muted")
         self.status_profile = QLabel("Perfil: AUTO")

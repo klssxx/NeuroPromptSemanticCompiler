@@ -117,7 +117,7 @@ def fill_variables(
 
 def validate_template(text: str, require_variables: bool = False) -> dict:
     """Validate a template text and return a status dict.
-    
+
     Returns:
         {
             "valid": bool,

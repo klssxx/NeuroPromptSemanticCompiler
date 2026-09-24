@@ -1,13 +1,11 @@
 """About dialog for NeuroPrompt Semantic Compiler."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QUrl
 from PySide6.QtWidgets import (
     QDialog, QDialogButtonBox, QFrame, QHBoxLayout, QLabel,
-    QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget,
+    QPushButton, QScrollArea, QVBoxLayout, QWidget,
 )
-
-from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices
 
 try:

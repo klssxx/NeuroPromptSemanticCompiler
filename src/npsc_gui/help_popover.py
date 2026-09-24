@@ -109,7 +109,8 @@ class ContextHelpButton(QToolButton):
         self.glossary_id = glossary_id
         action_callback = None
         if glossary_id and glossary_callback:
-            action_callback = lambda: self._open_glossary(glossary_callback)
+            def action_callback() -> None:
+                self._open_glossary(glossary_callback)
         self._popover = ContextHelpPopover(title, body, self.window(), "Ver en glosario", action_callback)
         self._hide_timer = QTimer(self)
         self._hide_timer.setSingleShot(True)

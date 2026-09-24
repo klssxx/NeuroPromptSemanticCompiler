@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-import json
 from typing import Any
 
 from context_loss_verifier import verify_context_loss

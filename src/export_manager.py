@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from utils import ensure_dir, write_text
+from utils import ensure_dir
 
 
 def export_markdown_result(result: dict[str, Any], out_dir: str | Path, basename: str = "result") -> Path:

@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import QRectF, QTimer, Qt, Signal, Slot
-from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPen
+from PySide6.QtCore import QRectF, QTimer, Qt, Signal
+from PySide6.QtGui import QColor, QFont, QPainter, QPen
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel
 
 
@@ -178,4 +178,4 @@ class ScanRing(QFrame):
         }
         self._colors = palette.get(self._state, palette["idle"])
         self._val_label.setStyleSheet(f"color: {self._colors['text'].name()}; background: transparent; border: none;")
-        self._sub_lbl.setStyleSheet(f"color: #6C717A; background: transparent; border: None;")
+        self._sub_lbl.setStyleSheet("color: #6C717A; background: transparent; border: None;")
