@@ -252,6 +252,181 @@ def _extract_risks(text: str) -> list[str]:
     return unique_preserve(risks)
 
 
+# ─── B.2: semantic gap analysis (ambiguities / contradictions / assumptions) ───
+# All deterministic and local: no model calls, no network. Every message is a
+# full readable sentence (why it matters), never a bare code.
+
+_DEFAULT_GOAL = "compile semantic instruction from prompt"
+_DEFAULT_ROLE = "semantic_compiler_operator"
+_FALLBACK_TARGET = "generic"
+_PLACEHOLDER_RE = re.compile(r"\{\{(\w+)\}\}")
+
+_CONTRACTION_PAIRS: list[tuple[tuple[str, ...], tuple[str, ...], str]] = [
+    (
+        ("rápido", "rapido", "fast", "quick", "lo antes posible", "ya mismo"),
+        ("detallado", "exhaustivo", "detailed", "exhaustive", "thorough", "muy completo"),
+        "generar detalle cuesta tiempo; el texto no declara cuál de los dos manda",
+    ),
+    (
+        ("corto", "breve", "conciso", "short", "resumido"),
+        ("detallado", "exhaustivo", "extenso", "largo", "detailed", "exhaustive"),
+        "la extensión pedida choca con el nivel de detalle pedido",
+    ),
+    (
+        ("simple", "sencillo", "minimalista", "simple", "minimal"),
+        ("complejo", "avanzado", "complex", "con todas las funciones", "completo"),
+        "una solución no puede ser minimalista y tener todas las funciones a la vez",
+    ),
+    (
+        ("gratis", "sin coste", "free of charge",),
+        ("de pago", "premium", "suscripción", "paid", "subscription"),
+        "el modelo de coste declarado se contradice",
+    ),
+    (
+        ("local", "offline", "sin nube", "air-gapped"),
+        ("en la nube", "cloud", "online", "sincroniza con"),
+        "el despliegue local-first excluye el despliegue en nube declarado",
+    ),
+]
+
+_ACCEPTANCE_MARKERS = (
+    "criterios de aceptación", "criterio de aceptación", "acceptance criteria",
+    "definition of done", "se considera exitoso", "se considera correcto",
+    "se considera listo", "como validar", "cómo validar", "cómo verificar",
+    "checklist", "verifica que", "valida que", "test de aceptación",
+)
+
+
+def _detect_contradictions(text: str) -> list[str]:
+    lowered = text.lower()
+    found: list[str] = []
+    for side_a, side_b, why in _CONTRACTION_PAIRS:
+        hit_a = next((p for p in side_a if p in lowered), None)
+        hit_b = next((p for p in side_b if p in lowered), None)
+        if hit_a and hit_b:
+            found.append(
+                f"Contradicción interna: el texto pide '{hit_a}' y a la vez '{hit_b}' — {why}."
+            )
+    return found
+
+
+def _detect_ambiguities(
+    text: str,
+    *,
+    goal: str,
+    target: str,
+    tasks: list[str],
+    output: list[str],
+) -> list[str]:
+    ambiguities: list[str] = []
+    if not text.strip():
+        ambiguities.append(
+            "No hay objetivo: el texto de entrada está vacío, así que no existe intención "
+            "que conservar y el compilador no puede decidir qué preservar."
+        )
+        return ambiguities
+
+    if goal == _DEFAULT_GOAL:
+        ambiguities.append(
+            "No hay objetivo utilizable: ninguna frase del texto sirve como goal, "
+            "por lo que la compilación trabajaría sobre una intención inventada."
+        )
+    if not tasks:
+        ambiguities.append(
+            "No se identifican tareas concretas: la especificación no dice qué hay que "
+            "hacer y el resultado no será accionable."
+        )
+    if not output:
+        ambiguities.append(
+            "No se especifica la salida esperada: sin contrato de salida (formato o "
+            "entregable) no habrá forma de verificar lo producido."
+        )
+    if target == _FALLBACK_TARGET:
+        ambiguities.append(
+            "No se declara el modelo objetivo: el prompt se compilará para un target "
+            "genérico en lugar de adaptarse a un modelo concreto."
+        )
+    lowered = text.lower()
+    if not any(marker in lowered for marker in _ACCEPTANCE_MARKERS):
+        ambiguities.append(
+            "No hay criterios de aceptación: nada en el texto define cómo validar que "
+            "el resultado es correcto, así que el éxito quedaría sin verificar."
+        )
+    for name in _PLACEHOLDER_RE.findall(text):
+        ambiguities.append(
+            f"La variable '{{{{{name}}}}}' queda sin rellenar: el prompt contiene un hueco "
+            "que podría colarse hasta la salida final sin que nadie lo note."
+        )
+    return ambiguities
+
+
+def _build_assumptions(text: str, *, language: str, target: str, role: str) -> list[dict[str, Any]]:
+    """System inferences, explicitly separated from user-provided data."""
+    lowered = text.lower()
+    assumptions: list[dict[str, Any]] = []
+
+    if language != "mixed" and not any(
+        marker in lowered for marker in ("español", "spanish", "inglés", "english", "idioma")
+    ):
+        assumptions.append({
+            "field": "language",
+            "value": language,
+            "confidence": 0.8,
+            "origin": "system_inferred",
+            "reason": "Idioma inferido del vocabulario del texto; el usuario no lo declaró.",
+        })
+
+    if target == _FALLBACK_TARGET:
+        assumptions.append({
+            "field": "target",
+            "value": _FALLBACK_TARGET,
+            "confidence": 0.4,
+            "origin": "system_fallback",
+            "reason": "Ningún marcador de modelo objetivo en el texto; se aplica el fallback genérico.",
+        })
+
+    if role == _DEFAULT_ROLE:
+        assumptions.append({
+            "field": "role",
+            "value": _DEFAULT_ROLE,
+            "confidence": 0.5,
+            "origin": "system_fallback",
+            "reason": "Sin pistas de rol en el texto; se asume el rol operador por defecto.",
+        })
+    else:
+        assumptions.append({
+            "field": "role",
+            "value": role,
+            "confidence": 0.7,
+            "origin": "system_inferred",
+            "reason": "Rol deducido de palabras clave del texto, no declarado explícitamente.",
+        })
+    return assumptions
+
+
+def _field_confidence(
+    text: str, *, language: str, target: str, role: str, goal: str,
+    tasks: list[str], constraints: list[str], priorities: list[str],
+    tools: list[str], output: list[str], style: list[str], risks: list[str],
+) -> dict[str, float]:
+    def list_conf(values: list[str]) -> float:
+        return 0.8 if values else 0.2
+
+    return {
+        "goal": 0.9 if (text.strip() and goal != _DEFAULT_GOAL) else 0.2,
+        "target": 0.9 if target != _FALLBACK_TARGET else 0.4,
+        "role": 0.7 if role != _DEFAULT_ROLE else 0.5,
+        "language": 0.9 if language in ("es", "en") and text.strip() else 0.4,
+        "tasks": list_conf(tasks),
+        "constraints": list_conf(constraints),
+        "priorities": list_conf(priorities),
+        "tools": list_conf(tools),
+        "output": list_conf(output),
+        "style": list_conf(style),
+        "risks": list_conf(risks),
+    }
+
+
 def extract_semantics(text: str) -> dict[str, Any]:
     patterns = _load_patterns()
     language = _detect_language(text)
@@ -265,6 +440,16 @@ def extract_semantics(text: str) -> dict[str, Any]:
     output = _extract_output(text)
     style = _extract_style(text)
     risks = _extract_risks(text)
+    contradictions = _detect_contradictions(text)
+    ambiguities = _detect_ambiguities(
+        text, goal=goal, target=target, tasks=tasks, output=output
+    )
+    assumptions = _build_assumptions(text, language=language, target=target, role=role)
+    confidence = _field_confidence(
+        text, language=language, target=target, role=role, goal=goal,
+        tasks=tasks, constraints=constraints, priorities=priorities,
+        tools=tools, output=output, style=style, risks=risks,
+    )
     return {
         "language": language,
         "target": target,
@@ -282,4 +467,9 @@ def extract_semantics(text: str) -> dict[str, Any]:
             "no_sudo", "no_external_api", "no_destructive_actions",
             "stay_inside_project_root", "offline_only",
         ]],
+        # B.2 — semantic gap analysis (additive; no A.6-verified field removed)
+        "ambiguities": ambiguities,
+        "contradictions": contradictions,
+        "assumptions": assumptions,
+        "confidence": confidence,
     }

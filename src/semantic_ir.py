@@ -75,6 +75,12 @@ def build_semantic_ir(
             "tasks": list(semantics.get("tasks", [])),
             "risks": list(semantics.get("risks", [])),
             "target": semantics.get("target", ""),
+            # B.2 — semantic gap analysis (None-tolerant: extract_semantics
+            # predates these keys in persisted fixtures)
+            "ambiguities": list(semantics.get("ambiguities") or []),
+            "contradictions": list(semantics.get("contradictions") or []),
+            "assumptions": list(semantics.get("assumptions") or []),
+            "confidence": dict(semantics.get("confidence") or {}),
         },
         "user_intent_ir": {
             "role": {"value": semantics.get("role", ""), "origin": "user_inferred", "layer": "USER_INTENT_IR"},
