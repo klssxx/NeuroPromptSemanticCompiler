@@ -23,7 +23,9 @@ py-modules = [
   "compiler_defaults",
   "constraint_normalizer",
   "context_loss_verifier",
+  "export_manager",
   "exporters",
+  "field_validator",
   "hybrid_output",
   "i18n",
   "model_adapter",
@@ -36,12 +38,16 @@ py-modules = [
   "report_builder",
   "resource_paths",
   "rop_template",
+  "safety_vocabulary",
   "semantic_dictionary",
   "semantic_extractor",
   "semantic_ir",
   "semantic_seed_mapper",
+  "template_manager",
   "token_estimator",
-  "utils"
+  "utils",
+  "variables",
+  "version_history"
 ]
 
 [tool.setuptools.packages.find]
