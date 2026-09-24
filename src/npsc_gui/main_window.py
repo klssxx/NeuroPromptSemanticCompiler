@@ -57,7 +57,7 @@ from npsc_gui.advanced_mode_page import AdvancedModePage
 from npsc_gui.about_dialog import AboutDialog
 from npsc_gui.export_preview import ExportPreviewDialog
 from token_estimator import estimate_counters
-from variables import detect_variables, fill_variables
+from variables import extract_variables, fill_variables
 from field_validator import validate_compile_form
 from version_history import VersionHistory
 from template_manager import TemplateManager
@@ -1682,7 +1682,7 @@ class MainWindow(QMainWindow):
             return
 
         # ── Variable detection and substitution ──
-        detected_vars = detect_variables(prompt)
+        detected_vars = extract_variables(prompt)
         if detected_vars:
             unfilled = [v for v in detected_vars if not self._variable_values.get(v, "").strip()]
             if unfilled:
@@ -1692,7 +1692,7 @@ class MainWindow(QMainWindow):
                     "Usa Editar → Rellenar variables o completa las variables antes de compilar."
                 )
                 return
-            prompt = fill_variables(prompt, self._variable_values, strict=False)
+            prompt, _unfilled = fill_variables(prompt, self._variable_values, strict=False)
 
         # ── Pre-compilation validation ──
         validation = validate_compile_form(
@@ -2234,7 +2234,7 @@ class MainWindow(QMainWindow):
         from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit
 
         prompt = self._get_current_prompt()
-        vars_found = detect_variables(prompt)
+        vars_found = extract_variables(prompt)
         if not vars_found:
             QMessageBox.information(self, "Variables", "No se detectaron variables {{variable}} en el prompt actual.")
             return

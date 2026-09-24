@@ -57,7 +57,7 @@ echo ""
 echo "── Core Imports ──"
 if QT_QPA_PLATFORM=offscreen PYTHONPATH="$ROOT/src" "$PY" -c "
 from i18n import tr, set_language
-from variables import detect_variables, fill_variables
+from variables import extract_variables, fill_variables
 from template_manager import TemplateManager, PromptTemplate
 from version_history import VersionHistory, compute_diff
 from export_manager import export_markdown_result, export_json_result, export_txt_result
