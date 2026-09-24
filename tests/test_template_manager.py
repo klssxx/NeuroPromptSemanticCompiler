@@ -1,20 +1,31 @@
 """Tests for template_manager.py.
 
-P1-5 addition: duplicate-ID import rejection test.
-Verifies that importing a template whose ID already exists in the store
-either raises an appropriate error or returns a failure indicator — it must
-never silently overwrite an existing template.
+Coverage lineage (A.6 integrity audit):
+- Restored: the real-API CRUD/duplicate/categories/export-import coverage
+  that the historical test file asserted (create, duplicate-id create raise,
+  get, update, delete, duplicate, list_all, categories, export/import
+  round-trip). The PR had replaced it with tests for a dict-based API
+  (add_template/list_templates/...) that no implementation ever provided —
+  those phantom-API tests failed at collection-behind-ruff and are superseded
+  by this file.
+- Kept from the PR (P1-5 intent, adapted to the real file-based
+  import_template(src: Path) API): importing a template whose id collides
+  with an existing one must NEVER silently overwrite the original. The
+  implementation regenerates a fresh id in that case, which satisfies the
+  data-integrity invariant; these tests pin that invariant so a future
+  refactor cannot silently drop it.
 """
 from __future__ import annotations
 
-import copy
+import json
 import sys
 import os
+
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from template_manager import TemplateManager
+from template_manager import PromptTemplate, TemplateManager
 
 
 @pytest.fixture()
@@ -22,79 +33,120 @@ def manager(tmp_path):
     return TemplateManager(storage_dir=tmp_path)
 
 
-def _make_template(name: str = "Test template", body: str = "Do {{task}} carefully.") -> dict:
-    return {"name": name, "body": body, "tags": ["test"]}
+def _tpl(tid: str, name: str = "Test", content: str = "Hello {{x}}", **kwargs) -> PromptTemplate:
+    return PromptTemplate(id=tid, name=name, content=content, **kwargs)
 
 
 class TestTemplateManagerCRUD:
-    def test_add_and_list(self, manager):
-        manager.add_template(_make_template())
-        templates = manager.list_templates()
-        assert len(templates) == 1
+    def test_create_template(self, manager):
+        manager.create(_tpl("tpl-1"))
+        assert manager.count() == 1
 
-    def test_get_by_id(self, manager):
-        tid = manager.add_template(_make_template())
-        t = manager.get_template(tid)
-        assert t is not None
-        assert t["name"] == "Test template"
+    def test_create_duplicate_id_raises(self, manager):
+        manager.create(_tpl("tpl-1"))
+        with pytest.raises(ValueError):
+            manager.create(_tpl("tpl-1"))
 
-    def test_delete(self, manager):
-        tid = manager.add_template(_make_template())
-        manager.delete_template(tid)
-        assert manager.get_template(tid) is None
-
-    def test_search_by_name(self, manager):
-        manager.add_template(_make_template(name="Alpha template"))
-        manager.add_template(_make_template(name="Beta template"))
-        results = manager.search_templates("Alpha")
-        assert len(results) == 1
-        assert results[0]["name"] == "Alpha template"
+    def test_get_template(self, manager):
+        manager.create(_tpl("tpl-1", name="Test"))
+        retrieved = manager.get("tpl-1")
+        assert retrieved is not None
+        assert retrieved.name == "Test"
 
     def test_update_template(self, manager):
-        tid = manager.add_template(_make_template())
-        manager.update_template(tid, {"name": "Updated name"})
-        t = manager.get_template(tid)
-        assert t["name"] == "Updated name"
+        tpl = _tpl("tpl-1")
+        manager.create(tpl)
+        tpl.name = "Updated"
+        manager.update(tpl)
+        assert manager.get("tpl-1").name == "Updated"
+
+    def test_delete_template(self, manager):
+        manager.create(_tpl("tpl-1"))
+        assert manager.delete("tpl-1") is True
+        assert manager.count() == 0
+
+    def test_duplicate_template_gets_new_id(self, manager):
+        manager.create(_tpl("tpl-1"))
+        new_tpl = manager.duplicate("tpl-1")
+        assert new_tpl.id != "tpl-1"
+        assert "copia" in new_tpl.name
+        assert manager.count() == 2
+
+    def test_list_all(self, manager):
+        for i in range(3):
+            manager.create(_tpl(f"tpl-{i}", name=f"T{i}"))
+        assert len(manager.list_all()) == 3
+
+    def test_categories(self, manager):
+        manager.create(_tpl("t1", category="Dev"))
+        manager.create(_tpl("t2", category="Docs"))
+        cats = manager.categories()
+        assert "Dev" in cats and "Docs" in cats
+
+    def test_by_category(self, manager):
+        manager.create(_tpl("t1", category="Dev"))
+        manager.create(_tpl("t2", category="Docs"))
+        assert [t.id for t in manager.by_category("Dev")] == ["t1"]
 
 
 class TestTemplateManagerImport:
-    """P1-5: duplicate-ID import rejection.
+    """P1-5: duplicate-ID import must never overwrite the original template."""
 
-    Rationale: if import_template does not check for ID collisions, a second
-    import of the same template silently overwrites the first.  This is a data
-    integrity bug — the store would lose the original (possibly edited) template
-    without any indication to the user.
-    """
+    def test_import_new_template_succeeds(self, manager, tmp_path):
+        payload = {
+            "id": "fresh-import",
+            "name": "Imported template",
+            "content": "Do {{task}} carefully.",
+        }
+        src = tmp_path / "fresh_import.json"
+        src.write_text(json.dumps(payload), encoding="utf-8")
 
-    def test_import_new_template_succeeds(self, manager):
-        template = _make_template(name="Imported template")
-        manager.import_template(template)
-        # import_template may return the assigned id or a bool/dict.
-        # Either way, the template must be retrievable afterwards.
-        templates = manager.list_templates()
-        assert any(t["name"] == "Imported template" for t in templates)
+        imported = manager.import_template(src)
 
-    def test_duplicate_id_import_is_rejected(self, manager):
-        """Importing a template with an ID that already exists must not silently overwrite."""
-        # Step 1: add a template and capture its assigned id.
-        tid = manager.add_template(_make_template(name="Original"))
-        original = manager.get_template(tid)
+        assert any(t.name == "Imported template" for t in manager.list_all())
+        assert imported.content == "Do {{task}} carefully."
 
-        # Step 2: construct an import payload that carries the same id.
-        duplicate = copy.deepcopy(original)
-        duplicate["name"] = "Overwrite attempt"
+    def test_duplicate_id_import_never_overwrites_original(self, manager, tmp_path):
+        """Importing an id that already exists must not clobber the stored template.
 
-        # Step 3: attempt to import — must raise or signal failure.
+        The implementation may reject (raise) or import-as-copy (regenerate the
+        id); the invariant under test is that the ORIGINAL stays intact.
+        """
+        # Step 1: store the original and capture its id.
+        original = _tpl("dup-1", name="Original")
+        manager.create(original)
+
+        # Step 2: build an import payload carrying the same id but tampered data.
+        src = tmp_path / "duplicate.json"
+        payload = original.to_dict()
+        payload["name"] = "Overwrite attempt"
+        src.write_text(json.dumps(payload), encoding="utf-8")
+
+        # Step 3: import — must not overwrite.
         try:
-            manager.import_template(duplicate)
-            # If no exception: the method must signal rejection, not silently accept.
-            # We check that the original template is still intact.
-            after = manager.get_template(tid)
+            imported = manager.import_template(src)
+            after = manager.get("dup-1")
             assert after is not None, "Template was deleted on duplicate import."
-            assert after["name"] == "Original", (
-                f"Template was silently overwritten. name is now '{after['name']}' "
+            assert after.name == "Original", (
+                f"Template was silently overwritten: name is now {after.name!r} "
                 "but should still be 'Original'."
             )
+            # Import-as-copy must assign a distinct id, not reuse the colliding one.
+            assert imported.id != "dup-1"
+            assert manager.count() == 2
         except (ValueError, KeyError, RuntimeError) as exc:
-            # Explicit rejection via exception is the preferred behaviour.
+            # Explicit rejection is the preferred behaviour; original must remain.
             assert str(exc), "Exception raised but has no message."
+            assert manager.get("dup-1").name == "Original"
+
+    def test_export_import_roundtrip_preserves_content(self, manager, tmp_path):
+        manager.create(_tpl("exp-1", name="Export Test", content="Hello {{x}}", category="Test"))
+        export_path = manager.export_template("exp-1", tmp_path / "exported.json")
+        assert export_path.exists()
+
+        imported = manager.import_template(export_path)
+        assert imported.content == "Hello {{x}}"
+        assert imported.category == "Test"
+        # Re-importing a live id must import-as-copy, never overwrite.
+        assert imported.id != "exp-1"
+        assert manager.get("exp-1").name == "Export Test"
