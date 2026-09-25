@@ -18,6 +18,7 @@ from compilation_profiles import (
     validate_profile_name,
 )
 from compiler_defaults import load_compiler_defaults, strict_policy
+from clarification_gate import apply_prepend, evaluate_clarification_gate
 from context_loss_verifier import verify_context_loss
 from exporters import export_json, export_text, prepare_output_dir
 from hybrid_output import (
@@ -56,6 +57,10 @@ class CompileRequest:
     preserve_original: bool = True
     privacy_mode: str = "full_original"
     custom_model_name: str = ""
+    # B.6 clarification gate: "report" (default — attach decision only),
+    # "gate" (refuse while ambiguities exceed the profile threshold),
+    # "prepend" (compile but prepend a visible PREGUNTAS ABIERTAS block).
+    clarify: str = "report"
 
 
 def sha256_text(text: str) -> str:
@@ -241,6 +246,18 @@ def compile_prompt(request: CompileRequest) -> dict[str, Any]:
         seeds,
         target,
     )
+    # B.6: explicit clarification gate — never implicit (see clarification_gate).
+    clarification = evaluate_clarification_gate(
+        applied_profile, profiled_semantics.get("ambiguities") or [], request.clarify
+    )
+    if clarification.required and clarification.mode == "gate":
+        raise ValueError(
+            "Compilation withheld (clarify='gate'): the input exceeds the "
+            f"'{applied_profile}' ambiguity threshold. Open questions:\n- "
+            + "\n- ".join(clarification.questions)
+        )
+    if clarification.mode == "prepend":
+        optimized_prompt = apply_prepend(optimized_prompt, clarification)
     verifier = verify_context_loss(original, profiled_semantics, optimized_prompt, chosen_nsl, applied_profile, profile)
     strict_passed, strict_reasons = evaluate_strict(verifier) if request.strict else (True, [])
     verifier["strict_requested"] = bool(request.strict)
@@ -336,6 +353,7 @@ def compile_prompt(request: CompileRequest) -> dict[str, Any]:
         "quality_report": quality_report,
         "four_layers": four_layers,
         "policy_check": policy_check,
+        "clarification": clarification.to_dict(),
         "prompt_sha256": prompt_hash,
         "original": public_original,
         "privacy_mode": privacy_mode,
@@ -450,6 +468,7 @@ def compile_for_gui(
     target: str,
     requested_profile: str,
     requested_level: str,
+    clarify: str = "report",
 ) -> dict[str, Any]:
     """Compilation entry point for the GUI.
 
@@ -536,6 +555,18 @@ def compile_for_gui(
         seeds,
         target,
     )
+    # B.6: explicit clarification gate (GUI surfaces the questions itself).
+    clarification = evaluate_clarification_gate(
+        applied_profile, profiled_semantics.get("ambiguities") or [], clarify
+    )
+    if clarification.required and clarification.mode == "gate":
+        raise ValueError(
+            "Compilation withheld (clarify='gate'): the input exceeds the "
+            f"'{applied_profile}' ambiguity threshold. Open questions:\n- "
+            + "\n- ".join(clarification.questions)
+        )
+    if clarification.mode == "prepend":
+        optimized = apply_prepend(optimized, clarification)
     verifier = verify_context_loss(original, profiled_semantics, optimized, chosen_nsl, applied_profile, profile)
 
     # Strict evaluation is always run in GUI path (non-blocking — result exposed but not gating).
@@ -569,6 +600,7 @@ def compile_for_gui(
         "quality_report": quality_report,
         "four_layers": four_layers,
         "policy_check": policy_check,
+        "clarification": clarification.to_dict(),
         # Core compilation result
         "profile_status": profile_status,
         "semantics": profiled_semantics,
