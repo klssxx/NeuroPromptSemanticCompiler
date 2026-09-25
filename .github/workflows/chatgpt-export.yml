@@ -1,0 +1,40 @@
+name: ChatGPT source export
+
+on:
+  push:
+    branches:
+      - chatgpt-export-20260925
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout default branch snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          lfs: true
+          submodules: recursive
+
+      - name: Create repository archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY#*/}"
+          sha="$(git rev-parse HEAD)"
+          git archive --format=zip --prefix="${repo}/" -o "${repo}.zip" HEAD
+          printf '{"repository":"%s","branch":"main","commit":"%s"}\n' "$GITHUB_REPOSITORY" "$sha" > EXPORT_MANIFEST.json
+
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-export-NeuroPromptSemanticCompiler
+          path: |
+            NeuroPromptSemanticCompiler.zip
+            EXPORT_MANIFEST.json
+          if-no-files-found: error
+          retention-days: 1
