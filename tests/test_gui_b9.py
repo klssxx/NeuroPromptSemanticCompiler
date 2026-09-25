@@ -129,3 +129,30 @@ class TestOpenQuestionsVisible:
         assert "Sin preguntas abiertas" in w.simple_questions_tab.toPlainText()
         assert w.simple_quality_label.text() == ""
         w.close()
+
+
+class TestInitialFocus:
+    def test_prompt_editor_has_keyboard_focus_after_activation(self, qapp):
+        """Opening the app and typing must land in the prompt editor.
+
+        Qt assigns initial focus when the window is ACTIVATED (async, after
+        show); the watcher then claims the editor. Wait on the condition
+        with a bounded timeout instead of a fixed sleep.
+        """
+        from PySide6.QtTest import QTest
+
+        w = MainWindow()
+        w.show()
+        target_editor = w._current_editor()
+        deadline_ok = False
+        for _ in range(100):  # up to ~5 s; converges in a few hundred ms
+            qapp.processEvents()
+            QTest.qWait(50)
+            if w.focusWidget() is target_editor:
+                deadline_ok = True
+                break
+        assert deadline_ok, (
+            f"focus ended on {type(w.focusWidget()).__name__!r}, not the prompt editor "
+            f"(mode={w._current_mode!r})"
+        )
+        w.close()
