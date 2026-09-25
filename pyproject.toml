@@ -21,6 +21,7 @@ py-modules = [
   "benchmark_quality",
   "compilation_profiles",
   "compiler_defaults",
+  "clarification_gate",
   "constraint_normalizer",
   "context_loss_verifier",
   "export_manager",
