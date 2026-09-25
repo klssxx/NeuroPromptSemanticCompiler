@@ -1,0 +1,84 @@
+{
+  "schema": "npsc.prompt_cases.v1",
+  "cases": [
+    {
+      "id": "case01_ambiguous_coding_no_acceptance",
+      "text": "Hazme un script de Python para organizar archivos.",
+      "profile": "STANDARD",
+      "expect_ambiguities": true,
+      "requires_output_contract": false,
+      "critical_constraints": []
+    },
+    {
+      "id": "case02_spanish_safety_constraints",
+      "text": "Necesito una app local para gestionar inventario, sin sudo, sin APIs externas, nada destructivo, en Ubuntu. Quiero el resultado para codex. Criterios de aceptación: la app abre y los tests pasan.",
+      "profile": "STANDARD",
+      "expect_ambiguities": false,
+      "requires_output_contract": true,
+      "critical_constraints": ["no_sudo", "no_external_api", "no_destructive_actions"]
+    },
+    {
+      "id": "case03_unfilled_variables",
+      "text": "Genera un informe de {{proyecto}} para el módulo {{modulo}} con conclusiones.",
+      "profile": "STANDARD",
+      "expect_ambiguities": true,
+      "requires_output_contract": false,
+      "critical_constraints": []
+    },
+    {
+      "id": "case04_contradictory_requirements",
+      "text": "Hazlo rápido pero muy detallado y sin errores.",
+      "profile": "STANDARD",
+      "expect_ambiguities": true,
+      "requires_output_contract": false,
+      "critical_constraints": []
+    },
+    {
+      "id": "case05_empty_input_fails_controlled",
+      "text": "   \n\t  ",
+      "profile": "STANDARD",
+      "expect_error": "compile_prompt"
+    },
+    {
+      "id": "case06_research_needs_sources",
+      "text": "Investiga el estado del arte de compiladores semánticos de prompts y dame un análisis con fuentes.",
+      "profile": "RESEARCH_MAX",
+      "expect_ambiguities": true,
+      "requires_output_contract": false,
+      "critical_constraints": []
+    },
+    {
+      "id": "case07_json_output_schema",
+      "text": "Necesito un endpoint que devuelva la salida en JSON con esquema estricto y validación. Quiero el resultado para codex. Criterios de aceptación: el esquema valida contra jsonschema.",
+      "profile": "STANDARD",
+      "expect_ambiguities": false,
+      "requires_output_contract": true,
+      "critical_constraints": []
+    },
+    {
+      "id": "case08_potentially_sensitive_data",
+      "text": "Procesa este listado de clientes con sus correos y teléfonos y genera resúmenes locales.",
+      "profile": "STANDARD",
+      "expect_ambiguities": true,
+      "requires_output_contract": false,
+      "critical_constraints": []
+    },
+    {
+      "id": "case09_already_excellent",
+      "text": "Escribe un conversor de CSV a JSON en Python 3.11: entrada por stdin o --input, salida a stdout o --output, manejo de BOM UTF-8, errores de fila registrados en stderr sin abortar el lote, tests con pytest cubriendo filas malformadas, y criterios de aceptación: la suite pasa y el conversor procesa 10k filas en menos de 2 segundos. Compila el resultado para codex.",
+      "profile": "STANDARD",
+      "expect_ambiguities": false,
+      "requires_output_contract": false,
+      "critical_constraints": [],
+      "no_degradation": true,
+      "degradation_tolerance": 5
+    },
+    {
+      "id": "case10_unknown_target_clear_error",
+      "text": "Compila este prompt para un modelo inexistente.",
+      "profile": "STANDARD",
+      "target": "modelo_fantasma_xyz",
+      "expect_error": "target"
+    }
+  ]
+}

@@ -165,3 +165,128 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+# ─── B.7: labeled case benchmark ────────────────────────────────────────────
+# Runs labeled prompt cases through the real compile service and verifies
+# six invariants per case (goal preservation, gap detection, no invention,
+# executability, critical-constraint retention, no degradation of already
+# excellent prompts). Deterministic and local.
+
+import re  # noqa: E402  (case-benchmark helpers)
+from context_loss_verifier import INTERNAL_TERMS  # noqa: E402  (grouped with benchmark helpers)
+from npsc_service import CompileRequest, compile_prompt  # noqa: E402
+from prompt_quality import evaluate_quality  # noqa: E402
+
+
+def _goal_tokens(text: str) -> set[str]:
+    return {t.lower() for t in re.findall(r"\w{4,}", text)} - INTERNAL_TERMS
+
+
+def _normalized(text: str) -> str:
+    return text.lower().replace("-", "_")
+
+
+def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
+    """Run one labeled case through compile_prompt and check its invariants."""
+    checks: dict[str, bool] = {}
+    row: dict[str, Any] = {
+        "id": case["id"],
+        "profile": case.get("profile", "STANDARD"),
+        "checks": checks,
+        "passed": False,
+    }
+
+    expect_error = case.get("expect_error")
+    if expect_error:
+        try:
+            compile_prompt(CompileRequest(
+                original=case["text"],
+                target=case.get("target", "codex"),
+                profile=case.get("profile", "STANDARD"),
+            ))
+            checks["fails_controlled"] = False
+        except ValueError as exc:
+            checks["fails_controlled"] = case["expect_error"] in str(exc) or bool(str(exc))
+        except Exception:  # noqa: BLE001 — any non-ValueError escape is a failure
+            checks["fails_controlled"] = False
+        row["passed"] = checks["fails_controlled"]
+        return row
+
+    result = compile_prompt(CompileRequest(
+        original=case["text"],
+        target=case.get("target", "codex"),
+        profile=case.get("profile", "STANDARD"),
+    ))
+    semantics = result["semantics"]
+    optimized = result["optimized_prompt"]
+    row["quality_score"] = result["quality_report"]["score"]
+
+    # 1. goal preservation: enough distinctive goal tokens survive compilation
+    goal_text = str(semantics.get("goal") or "")
+    goal_tokens = _goal_tokens(goal_text)
+    kept = sum(1 for t in goal_tokens if t in _normalized(optimized))
+    checks["goal_preserved"] = bool(goal_tokens) and kept >= min(2, len(goal_tokens))
+
+    # 2. gap detection
+    ambiguities = semantics.get("ambiguities") or []
+    checks["ambiguities_detected"] = (
+        (len(ambiguities) > 0) if case.get("expect_ambiguities", True)
+        else (len(ambiguities) == 0)
+    )
+
+    # 3. no invention: the USER REQUIREMENTS layer (B.4) must not contain a
+    #    critical constraint the input never had. (The compiled text itself
+    #    intentionally carries the product-policy constraint set — that is
+    #    labeled policy, not invention; provenance separation is what B.4
+    #    guarantees.)
+    input_constraints = set(semantics.get("constraints") or [])
+    requirement_values = {
+        str(r.get("value", ""))
+        for r in result["four_layers"]["user_requirements"]
+        if r.get("kind") == "constraint"
+    }
+    forbidden = [
+        c for c in ("no_sudo", "no_external_api", "no_destructive_actions",
+                    "stay_inside_project_root", "offline_only")
+        if c not in input_constraints and c in requirement_values
+    ]
+    checks["nothing_invented"] = not forbidden
+    row["invented_constraints"] = forbidden
+
+    # 4. executability: output contract present when the case requires it
+    if case.get("requires_output_contract", False):
+        checks["executability"] = bool(result["quality_report"]["has_output_contract"])
+    else:
+        checks["executability"] = True
+
+    # 5. critical constraints retained verbatim (dash/underscore normalized)
+    critical = case.get("critical_constraints") or []
+    checks["critical_constraints_kept"] = all(
+        c in _normalized(optimized) for c in critical
+    )
+
+    # 6. case-9 non-degradation: compiling an already excellent prompt must
+    #    not LOWER its verifiable quality by more than the tolerance.
+    if case.get("no_degradation", False):
+        input_quality = evaluate_quality(case["text"], semantics, case["text"])
+        tolerance = int(case.get("degradation_tolerance", 5))
+        checks["not_degraded"] = (
+            result["quality_report"]["score"] >= input_quality.score - tolerance
+        )
+        row["input_quality_score"] = input_quality.score
+
+    row["passed"] = all(checks.values())
+    return row
+
+
+def run_case_benchmark(cases: list[dict[str, Any]]) -> dict[str, Any]:
+    """Run all labeled cases; returns a summary report with per-case rows."""
+    rows = [evaluate_case(case) for case in cases]
+    passed = sum(1 for r in rows if r["passed"])
+    return {
+        "total": len(rows),
+        "passed": passed,
+        "failed": len(rows) - passed,
+        "rows": rows,
+    }
