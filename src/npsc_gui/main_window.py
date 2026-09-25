@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from PySide6.QtCore import QObject, QThread, Qt, QUrl, Signal, Slot, QTimer
+from PySide6.QtCore import QEvent, QObject, QThread, Qt, QUrl, Signal, Slot, QTimer
 from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
@@ -158,6 +158,64 @@ class MainWindow(QMainWindow):
         self._restore_settings()
         self._update_counters()
         self._set_header_status("ok", tr("status.ready"))
+
+    def changeEvent(self, event) -> None:  # noqa: N802 — Qt naming
+        """Focus the prompt editor when the window is first activated.
+
+        When the window is activated, Qt assigns initial focus to the first
+        focusable child — the 'Activar modo extremo' header button — so
+        typing right after opening the app did nothing visible. That
+        assignment lands an indeterminate time AFTER the activation event
+        (queued behind it), so any single-shot claim races and loses; a
+        short watcher instead waits until Qt's assignment has landed (focus
+        reaches the default button) and then claims focus for the editor.
+        Applies to whichever mode the app opens in (settings restore may
+        open extreme mode directly).
+        """
+        super().changeEvent(event)
+        if (
+            event.type() == QEvent.Type.ActivationChange
+            and self.isActiveWindow()
+            and self._current_editor() is not None
+            and not getattr(self, "_prompt_focus_watcher", None)
+        ):
+            self._prompt_focus_attempts = 0
+            watcher = QTimer(self)
+            watcher.setInterval(20)
+            watcher.timeout.connect(self._claim_prompt_focus)
+            watcher.start()
+            self._prompt_focus_watcher = watcher
+
+    def _current_editor(self):
+        """The prompt input widget for the active mode (None if absent)."""
+        if self._current_mode == MODE_SIMPLE:
+            return getattr(self, "simple_prompt_edit", None)
+        return getattr(self, "prompt_edit", None)
+
+    def _claim_prompt_focus(self) -> None:
+        """One watcher tick: claim focus once Qt's initial assignment landed."""
+        self._prompt_focus_attempts += 1
+        editor = self._current_editor()
+        current = self.focusWidget()
+        if editor is None or current is editor:
+            self._stop_prompt_focus_watcher()
+        elif current is None or current is self.mode_toggle_btn:
+            if current is self.mode_toggle_btn:
+                # Qt's initial assignment has landed — claim the editor now.
+                editor.setFocus(Qt.OtherFocusReason)
+            if self._prompt_focus_attempts >= 100:
+                self._stop_prompt_focus_watcher()
+            # else: activation assignment has not landed yet; keep waiting
+        else:
+            # the user focused a real target — never fight the user
+            self._stop_prompt_focus_watcher()
+
+    def _stop_prompt_focus_watcher(self) -> None:
+        watcher = getattr(self, "_prompt_focus_watcher", None)
+        if watcher is not None:
+            watcher.stop()
+            watcher.deleteLater()
+            self._prompt_focus_watcher = None
 
     # ─── Layout ────────────────────────────────────────────────────
 
