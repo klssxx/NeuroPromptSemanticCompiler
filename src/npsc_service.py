@@ -617,4 +617,16 @@ def compile_for_gui(
         "hybrid": hybrid,
         "report": build_context_loss_report(verifier),
         "verifier": verifier,
+        # B.8 canonical-name aliases (additive): same objects as the legacy
+        # keys above, so GUI consumers stay untouched while the GUI result
+        # matches compile_prompt's schema for parity checks and exports.
+        "target": target,
+        "requested_target": target,
+        "requested_profile": requested_profile,
+        "applied_profile": applied_profile,
+        "requested_level": requested_level,
+        "chosen_level": chosen_level,
+        "chosen_nsl": chosen_nsl,
+        "optimized_prompt": optimized,
+        "context_loss_report": verifier,
     }
