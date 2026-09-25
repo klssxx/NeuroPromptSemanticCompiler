@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from PySide6.QtCore import QObject, QThread, Qt, QUrl, Signal, Slot, QTimer
 from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence, QShortcut
@@ -502,6 +503,13 @@ class MainWindow(QMainWindow):
         self.simple_validation_tab = QPlainTextEdit()
         self.simple_validation_tab.setReadOnly(True)
         self.simple_tabs.addTab(self.simple_validation_tab, "Validación")
+
+        # B.9: open questions from the compiled result, visible without
+        # opening the exported JSON. Non-blocking by design — whether the
+        # compile itself gates is the caller's clarify-mode decision (B.6).
+        self.simple_questions_tab = QPlainTextEdit()
+        self.simple_questions_tab.setReadOnly(True)
+        self.simple_tabs.addTab(self.simple_questions_tab, "Preguntas abiertas")
         layout.addWidget(self.simple_tabs, 1)
 
         # Primary action — copy
@@ -531,6 +539,11 @@ class MainWindow(QMainWindow):
         self.simple_metrics_label = QLabel("")
         self.simple_metrics_label.setObjectName("Muted")
         layout.addWidget(self.simple_metrics_label)
+
+        # B.9: deterministic quality score (prompt_quality) + worst issues
+        self.simple_quality_label = QLabel("")
+        self.simple_quality_label.setObjectName("Muted")
+        layout.addWidget(self.simple_quality_label)
 
         # Generated files access (compact)
         self.simple_files_row = QHBoxLayout()
@@ -1892,6 +1905,70 @@ class MainWindow(QMainWindow):
 
     # ─── Result rendering ──────────────────────────────────────────
 
+    def _render_b9_fields(self, result: dict[str, Any]) -> None:
+        """B.9: surface quality score + open questions in the simple result view.
+
+        Read-only visibility: nothing here blocks or changes compilation
+        behaviour (that is the clarify mode's job, B.6). Missing fields
+        degrade to informative placeholders — the widget works with any
+        result shape, pre- or post-B.2.
+        """
+        # Quality score + highest-severity issues (deterministic evaluator, B.3)
+        quality = result.get("quality_report") or {}
+        score = quality.get("score")
+        issues = quality.get("issues") or []
+        if score is None:
+            self.simple_quality_label.setText("")
+            self.simple_quality_label.setToolTip("")
+        else:
+            severity_rank = {"error": 0, "warning": 1, "info": 2}
+            top = sorted(issues, key=lambda i: severity_rank.get(i.get("severity"), 3))[:8]
+            counts = {"error": 0, "warning": 0, "info": 0}
+            for issue in issues:
+                sev = issue.get("severity", "info")
+                counts[sev] = counts.get(sev, 0) + 1
+            self.simple_quality_label.setText(
+                f"Calidad: {score}/100"
+                f" · {counts['error']} errores · {counts['warning']} avisos · {counts['info']} notas"
+            )
+            if top:
+                tooltip = "\n".join(f"[{i.get('severity', '?')}] {i.get('message', '')}" for i in top)
+                more = len(issues) - len(top)
+                if more > 0:
+                    tooltip += f"\n… y {more} más (ver hybrid_semantic_prompt.json)"
+                self.simple_quality_label.setToolTip(tooltip)
+            else:
+                self.simple_quality_label.setToolTip("Sin incidencias detectadas por el evaluador.")
+
+        # Open questions: clarification gate (B.6) first, raw IR fallback (B.2)
+        clarification = result.get("clarification") or {}
+        questions = list(clarification.get("questions") or [])
+        if not questions:
+            questions = [
+                str(q) for q in ((result.get("four_layers") or {}).get("open_questions") or [])
+            ]
+        if questions:
+            body = "\n".join(f"{i}. {q}" for i, q in enumerate(questions, start=1))
+            if clarification.get("required"):
+                body = (
+                    "⚠ Estas preguntas superan el umbral del perfil activo. "
+                    "Respóndelas y vuelve a compilar para un resultado fiable.\n\n" + body
+                )
+        else:
+            body = (
+                "Sin preguntas abiertas: la entrada cubre objetivo, salida, "
+                "criterios de aceptación y modelo objetivo."
+            )
+        self.simple_questions_tab.setPlainText(body)
+
+        questions_count = len(questions)
+        tab_title = (
+            f"Preguntas abiertas ({questions_count})" if questions_count else "Preguntas abiertas ✓"
+        )
+        index = self.simple_tabs.indexOf(self.simple_questions_tab)
+        if index >= 0:
+            self.simple_tabs.setTabText(index, tab_title)
+
     def _render_result(self) -> None:
         if not self.result:
             self._set_status(tr("error.no_result"), self._get_current_profile(), "error", "")
@@ -1981,6 +2058,7 @@ class MainWindow(QMainWindow):
         self.simple_optimized_tab.setPlainText(result["optimized_prompt"])
         self.simple_report_tab.setPlainText(result["hybrid_markdown"])
         self.simple_validation_tab.setPlainText(result["context_loss_markdown"])
+        self._render_b9_fields(result)
 
         # Compact metrics
         constraints_count = len(validation.get("critical_constraints_preserved", []))
