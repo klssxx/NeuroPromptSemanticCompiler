@@ -30,6 +30,7 @@ from model_adapter import adapter_layer, load_model_profiles, select_level
 from nsl_compiler import compile_to_nsl
 from nsl_parser import parse_nsl
 from profile_selector import auto_select_profile
+from profile_policy import evaluate_profile_policy
 from prompt_quality import evaluate_quality
 from rop_template import rop_payload
 from semantic_ir import build_semantic_ir
@@ -327,12 +328,14 @@ def compile_prompt(request: CompileRequest) -> dict[str, Any]:
     # sentences never reach the markdown in hash_only privacy mode.
     four_layers = build_four_layer_sections(public_semantics, seeds)
     public_hybrid_markdown = append_four_layers_section(public_hybrid_markdown, four_layers)
+    policy_check = evaluate_profile_policy(applied_profile, public_semantics, four_layers).to_dict()
 
     return {
         "run_id": run_id,
         "created_at": created_at,
         "quality_report": quality_report,
         "four_layers": four_layers,
+        "policy_check": policy_check,
         "prompt_sha256": prompt_hash,
         "original": public_original,
         "privacy_mode": privacy_mode,
@@ -552,6 +555,7 @@ def compile_for_gui(
     )
     four_layers = build_four_layer_sections(profiled_semantics, seeds)
     hybrid = append_four_layers_section(hybrid, four_layers)
+    policy_check = evaluate_profile_policy(applied_profile, profiled_semantics, four_layers).to_dict()
 
     return {
         # Audit-trail fields (P1-3)
@@ -564,6 +568,7 @@ def compile_for_gui(
         "token_report": token_report,
         "quality_report": quality_report,
         "four_layers": four_layers,
+        "policy_check": policy_check,
         # Core compilation result
         "profile_status": profile_status,
         "semantics": profiled_semantics,
