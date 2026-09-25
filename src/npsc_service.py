@@ -172,6 +172,13 @@ def compile_prompt(request: CompileRequest) -> dict[str, Any]:
             target = detected_target
         else:
             target = "codex"
+    elif target not in model_profiles:
+        # P1-2 parity with compile_for_gui: an explicit unknown target must
+        # fail with a clear error instead of being echoed into NSL artifacts.
+        raise ValueError(
+            f"[compile_prompt] unknown target '{target}'. "
+            f"Valid targets: {sorted(model_profiles.keys())}"
+        )
     requested_profile = validate_profile_name(request.profile, compilation_profiles)
     auto_info: dict[str, Any] = {}
     applied_profile = requested_profile
